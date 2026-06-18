@@ -26,7 +26,6 @@
         }
         .btn:active{transform:scale(0.95)}
         .btn-up{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
-        .btn-refresh{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
         .content{flex:1;padding:20px}
         .card{
             background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);
@@ -122,7 +121,7 @@
         </div>
 
         <div class="content page active" id="main">
-            <button class="btn btn-refresh" onclick="loadVideos()" style="margin-bottom:15px;">🔄 Обновить</button>
+            <button class="btn" style="background:#5DADE2;margin-bottom:15px;" onclick="loadVideos()">🔄 Обновить</button>
             <div id="list"></div>
         </div>
 
@@ -152,19 +151,14 @@
 
         async function loadVideos() {
             const list = document.getElementById('list');
-            list.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><p>Сканирую Google Диск...</p></div>';
+            list.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>';
 
             try {
                 const res = await fetch(SCRIPT_URL);
                 const videos = await res.json();
                 
-                if (videos.error) {
-                    list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><p>${videos.error}</p></div>`;
-                    return;
-                }
-                
                 if (!videos.length) {
-                    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео на Диске</p><p style="font-size:13px;">Загрузите через кнопку "Загрузить"</p></div>';
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео</p></div>';
                     return;
                 }
                 
@@ -175,7 +169,7 @@
                     </div>
                 `).join('');
             } catch(e) {
-                list.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><p>Ошибка загрузки</p></div>';
+                list.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><p>Ошибка</p></div>';
             }
         }
 
@@ -186,14 +180,14 @@
                     show('video');
                     document.getElementById('player').innerHTML = `
                         <video controls autoplay playsinline>
-                            <source src="https://drive.google.com/uc?export=download&id=${v.driveId}" type="video/mp4">
+                            <source src="${v.downloadUrl}" type="video/mp4">
                         </video>
                         <div class="details">
                             <h2>${v.name}</h2>
                             <p style="color:#5D6D7E;">👁 ${v.views} просмотров</p>
                             <div class="actions">
                                 <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes}</button>
-                                <button class="btn btn-share" onclick="share()">📤 Поделиться</button>
+                                <button class="btn btn-share" onclick="share()">📤</button>
                             </div>
                         </div>
                     `;
@@ -207,7 +201,7 @@
 
         function share() {
             navigator.clipboard.writeText(window.location.href);
-            toast('📋 Ссылка скопирована!');
+            toast('📋 Скопировано!');
         }
 
         function upload() {
@@ -245,21 +239,21 @@
                     
                     if (data.success) {
                         fill.style.width = '100%';
-                        toast('✅ Загружено на Google Диск!');
+                        toast('✅ Загружено!');
                         setTimeout(() => {
                             document.getElementById('file').value = '';
                             document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
                             document.getElementById('title').value = '';
                             bar.style.display = 'none';
-                            btn.disabled = false; btn.textContent = '✨ Загрузить на Диск';
+                            btn.disabled = false; btn.textContent = '✨ Загрузить';
                             show('main');
                         }, 1000);
                     } else {
                         throw new Error(data.error);
                     }
                 } catch(err) {
-                    toast('❌ ' + err.message);
-                    btn.disabled = false; btn.textContent = '✨ Загрузить на Диск';
+                    toast('❌ Ошибка');
+                    btn.disabled = false; btn.textContent = '✨ Загрузить';
                     bar.style.display = 'none';
                 }
             };
