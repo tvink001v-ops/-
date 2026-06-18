@@ -131,7 +131,7 @@
             object-fit: cover;
         }
 
-        .card-info { padding: 12px 15px; position: relative; z-index: 3; }
+        .card-info { padding: 12px 15px; }
 
         .card-title {
             font-size: 16px;
@@ -193,12 +193,7 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
-        .details-card h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a5276;
-            margin-bottom: 10px;
-        }
+        .details-card h2 { font-size: 20px; font-weight: 700; color: #1a5276; margin-bottom: 10px; }
 
         .actions { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
 
@@ -219,10 +214,8 @@
             font-size: 14px;
         }
 
-        .btn:active { transform: scale(0.95); }
         .btn-like { background: var(--aero-green); }
         .btn-share { background: var(--aero-blue); }
-        .btn-delete { background: var(--aero-red); }
 
         .upload-form {
             background: var(--aero-glass);
@@ -235,14 +228,7 @@
         }
 
         .form-group { margin-bottom: 20px; }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1a5276;
-            font-size: 14px;
-        }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a5276; font-size: 14px; }
 
         .input {
             width: 100%;
@@ -287,7 +273,6 @@
         }
 
         .submit-btn:disabled { opacity: 0.5; }
-        .submit-btn:active { transform: scale(0.95); }
 
         .progress {
             margin-top: 20px;
@@ -381,20 +366,6 @@
 
         .nav-btn.active { background: var(--aero-glass); }
         .nav-icon { font-size: 22px; }
-
-        .token-box {
-            background: rgba(255,255,200,0.4);
-            border: 1px solid rgba(255,200,0,0.5);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-size: 13px;
-            color: #6D4C00;
-        }
-
-        .token-box input { margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -413,10 +384,7 @@
 
         <div class="content page active" id="page-main">
             <div class="video-list" id="videoList">
-                <div class="empty">
-                    <div class="empty-icon">⏳</div>
-                    <h3>Загрузка...</h3>
-                </div>
+                <div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>
             </div>
         </div>
 
@@ -427,12 +395,6 @@
 
         <div class="content page" id="page-upload">
             <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
-            <div class="token-box" id="tokenBox" style="display:none;">
-                ⚠️ <strong>Нужен GitHub токен</strong><br>
-                <small>Создайте токен с правами <code>repo</code> на <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></small>
-                <input type="password" class="input" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx" style="margin-top:8px;">
-                <button class="btn" onclick="saveToken()" style="margin-top:8px;">💾 Сохранить</button>
-            </div>
             <form class="upload-form" id="uploadForm">
                 <div class="form-group">
                     <label>📝 Название</label>
@@ -443,7 +405,7 @@
                     <input type="text" class="input" id="authorInput" placeholder="Ваше имя" value="Аноним">
                 </div>
                 <div class="form-group">
-                    <label>🎥 Видео (до 100MB)</label>
+                    <label>🎥 Видео файл</label>
                     <label class="file-label" for="videoInput" id="videoLabel">📁 Выбрать видео</label>
                     <input type="file" class="file-input" id="videoInput" accept="video/*" required>
                 </div>
@@ -467,80 +429,72 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Конфигурация GitHub
+        // Ваши данные GitHub
+        const GITHUB_TOKEN = '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';
         const GITHUB_USER = 'tvink001v-ops';
         const GITHUB_REPO = '-';
         const VIDEOS_PATH = 'videos';
         
-        let githubToken = localStorage.getItem('github_token');
-        
-        // Загрузка списка видео из GitHub
+        // Загрузка списка видео из папки videos
         async function loadVideos(query = '') {
             const container = document.getElementById('videoList');
             container.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>';
             
             try {
-                const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}`;
-                const headers = githubToken ? { 'Authorization': `token ${githubToken}` } : {};
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}`, {
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+                });
                 
-                const res = await fetch(url, { headers });
-                
-                if (res.status === 403 && !githubToken) {
-                    container.innerHTML = `
-                        <div class="empty">
-                            <div class="empty-icon">🔐</div>
-                            <h3>Нужен GitHub токен</h3>
-                            <p>Нажмите "Загрузить" и добавьте токен</p>
-                        </div>`;
+                if (!res.ok) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
                     return;
                 }
                 
                 const files = await res.json();
-                
                 if (!Array.isArray(files)) {
                     container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
                     return;
                 }
                 
-                // Фильтруем JSON файлы
                 const jsonFiles = files.filter(f => f.name.endsWith('.json'));
                 
-                // Загружаем метаданные
-                const videos = await Promise.all(jsonFiles.map(async f => {
-                    const metaRes = await fetch(f.download_url);
-                    return await metaRes.json();
-                }));
-                
-                let filtered = videos;
-                if (query) {
-                    const q = query.toLowerCase();
-                    filtered = videos.filter(v => 
-                        v.title.toLowerCase().includes(q) || 
-                        v.author.toLowerCase().includes(q)
-                    );
+                if (jsonFiles.length === 0) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
+                    return;
                 }
                 
+                const videos = [];
+                for (const f of jsonFiles) {
+                    try {
+                        const metaRes = await fetch(f.download_url);
+                        const v = await metaRes.json();
+                        videos.push(v);
+                    } catch(e) {}
+                }
+                
+                videos.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                let filtered = query ? videos.filter(v => 
+                    v.title.toLowerCase().includes(query.toLowerCase()) || 
+                    v.author.toLowerCase().includes(query.toLowerCase())
+                ) : videos;
+                
                 if (filtered.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty">
-                            <div class="empty-icon">${query ? '🔍' : '📭'}</div>
-                            <h3>${query ? 'Ничего не найдено' : 'Нет видео'}</h3>
-                            <p>${query ? 'Другой запрос' : 'Загрузите первое!'}</p>
-                        </div>`;
+                    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>Ничего не найдено</h3></div>`;
                     return;
                 }
                 
                 container.innerHTML = filtered.map(v => `
                     <div class="video-card" onclick="openVideo('${v.id}')">
                         <div class="thumb-wrap">
-                            <img src="${v.thumbnail || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 180%22><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%220%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%2387CEEB%22/><stop offset=%22100%25%22 stop-color=%22%234A90E2%22/></linearGradient></defs><rect fill=%22url(#g)%22 width=%22320%22 height=%22180%22/><text fill=%22white%22 font-size=%2250%22 x=%22160%22 y=%22100%22 text-anchor=%22middle%22>🎬</text></svg>')}" 
+                            <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" 
                                  alt="${v.title}" class="thumb">
                         </div>
                         <div class="card-info">
                             <div class="card-title">${v.title}</div>
                             <div class="card-meta">
                                 <span>👤 ${v.author}</span>
-                                <span class="badge">❤️ ${v.likes || 0} • 👁 ${v.views || 0}</span>
+                                <span class="badge">👁 ${v.views || 0} • ❤️ ${v.likes || 0}</span>
                             </div>
                         </div>
                     </div>
@@ -548,45 +502,46 @@
                 
             } catch(e) {
                 console.error(e);
-                container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>' + e.message + '</p></div>';
+                container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>${e.message}</p></div>`;
             }
         }
         
         // Открыть видео
         async function openVideo(id) {
-            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${VIDEOS_PATH}/${id}.json`;
-            const res = await fetch(url);
-            const v = await res.json();
-            
-            showPage('video');
-            
-            document.getElementById('videoContent').innerHTML = `
-                <div class="player-wrap">
-                    <video class="player" controls autoplay playsinline>
-                        <source src="${v.videoUrl}" type="video/mp4">
-                    </video>
-                </div>
-                <div class="details-card">
-                    <h2>${v.title}</h2>
-                    <div style="color:#5D6D7E;margin-bottom:10px;">
-                        <strong>${v.author}</strong> • ${(v.views || 0) + 1} просмотров
+            try {
+                const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${VIDEOS_PATH}/${id}.json`);
+                const v = await res.json();
+                
+                showPage('video');
+                
+                document.getElementById('videoContent').innerHTML = `
+                    <div class="player-wrap">
+                        <video class="player" controls autoplay playsinline>
+                            <source src="${v.videoUrl}" type="video/mp4">
+                        </video>
                     </div>
-                    <div class="actions">
-                        <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes || 0}</button>
-                        <button class="btn btn-share" onclick="shareVideo()">📤 Поделиться</button>
+                    <div class="details-card">
+                        <h2>${v.title}</h2>
+                        <div style="color:#5D6D7E;margin-bottom:10px;">
+                            <strong>${v.author}</strong> • ${v.views || 0} просмотров • ${new Date(v.date).toLocaleDateString('ru-RU')}
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes || 0}</button>
+                            <button class="btn btn-share" onclick="shareVideo()">📤 Поделиться</button>
+                        </div>
                     </div>
-                </div>
-            `;
-            
-            window.scrollTo(0, 0);
+                `;
+                
+                window.scrollTo(0, 0);
+            } catch(e) {
+                toast('Ошибка загрузки видео', 'error');
+            }
         }
         
-        // Лайк
         async function likeVideo(id) {
             toast('❤️ Спасибо!', 'success');
         }
         
-        // Поделиться
         function shareVideo() {
             if (navigator.share) {
                 navigator.share({ url: window.location.href }).catch(() => {});
@@ -596,26 +551,9 @@
             }
         }
         
-        // Токен
-        function saveToken() {
-            const token = document.getElementById('tokenInput').value.trim();
-            if (token) {
-                githubToken = token;
-                localStorage.setItem('github_token', token);
-                document.getElementById('tokenBox').style.display = 'none';
-                toast('✅ Токен сохранён!', 'success');
-            }
-        }
-        
-        // Загрузка видео в GitHub
+        // Загрузка видео
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            if (!githubToken) {
-                document.getElementById('tokenBox').style.display = 'block';
-                toast('⚠️ Нужен GitHub токен!', 'error');
-                return;
-            }
             
             const file = document.getElementById('videoInput').files[0];
             if (!file) return;
@@ -625,61 +563,58 @@
             const progressFill = document.getElementById('progressFill');
             
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Чтение файла...';
+            submitBtn.textContent = '⏳ Чтение...';
             progressBar.style.display = 'block';
-            progressFill.style.width = '0%';
+            progressFill.style.width = '10%';
             
             const reader = new FileReader();
             
             reader.onprogress = (e) => {
                 if (e.lengthComputable) {
-                    const pct = (e.loaded / e.total) * 50;
-                    progressFill.style.width = pct + '%';
+                    progressFill.style.width = (10 + (e.loaded / e.total) * 30) + '%';
                 }
             };
             
             reader.onload = async function(e) {
-                progressFill.style.width = '50%';
-                submitBtn.textContent = '⏳ Загрузка в GitHub...';
+                progressFill.style.width = '40%';
+                submitBtn.textContent = '⏳ Сохранение в GitHub...';
                 
                 const videoBase64 = e.target.result;
                 const id = Date.now().toString();
-                const title = document.getElementById('titleInput').value.trim();
-                const author = document.getElementById('authorInput').value.trim() || 'Аноним';
-                
-                // Сохраняем метаданные (без видео, только ссылка)
                 const metadata = {
                     id: id,
-                    title: title,
-                    author: author,
+                    title: document.getElementById('titleInput').value.trim(),
+                    author: document.getElementById('authorInput').value.trim() || 'Аноним',
                     videoUrl: videoBase64,
-                    thumbnail: null,
                     views: 0,
                     likes: 0,
                     date: new Date().toISOString()
                 };
                 
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(metadata))));
+                
                 try {
-                    // Сохраняем JSON с метаданными
-                    const metaRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}/${id}.json`, {
+                    progressFill.style.width = '60%';
+                    
+                    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}/${id}.json`, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': `token ${githubToken}`,
+                            'Authorization': `token ${GITHUB_TOKEN}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: `🎬 Добавлено видео: ${title}`,
-                            content: btoa(unescape(encodeURIComponent(JSON.stringify(metadata))))
+                            message: `🎬 Добавлено: ${metadata.title}`,
+                            content: content
                         })
                     });
                     
-                    if (!metaRes.ok) {
-                        const err = await metaRes.json();
+                    if (!res.ok) {
+                        const err = await res.json();
                         throw new Error(err.message);
                     }
                     
                     progressFill.style.width = '100%';
-                    toast('✅ Видео загружено в папку videos/', 'success');
+                    toast('✅ Видео сохранено в папку videos/', 'success');
                     
                     setTimeout(() => {
                         document.getElementById('uploadForm').reset();
@@ -689,7 +624,7 @@
                         submitBtn.disabled = false;
                         submitBtn.textContent = '✨ Загрузить видео';
                         showPage('main');
-                    }, 1500);
+                    }, 1000);
                     
                 } catch(err) {
                     toast('❌ ' + err.message, 'error');
@@ -702,16 +637,12 @@
             reader.readAsDataURL(file);
         });
         
-        // Навигация
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-' + page).classList.add('active');
-            
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-            
             document.getElementById('searchBox').style.display = page === 'main' ? 'block' : 'none';
-            
             if (page === 'main') loadVideos();
         }
         
@@ -739,11 +670,6 @@
         document.getElementById('searchInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') search();
         });
-        
-        // Показываем токен если есть
-        if (githubToken) {
-            document.getElementById('tokenInput').value = githubToken;
-        }
         
         loadVideos();
     </script>
