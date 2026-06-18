@@ -24,7 +24,28 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sun-flare {
+            position: fixed;
+            top: -50px; right: -50px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(255,255,200,0.6) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .app {
+            position: relative;
+            z-index: 1;
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
@@ -48,7 +69,11 @@
             justify-content: space-between;
         }
 
-        .logo { height: 28px; cursor: pointer; }
+        .logo {
+            height: 28px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            cursor: pointer;
+        }
 
         .header-btn {
             width: 40px; height: 40px;
@@ -62,42 +87,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .search-box { padding: 15px 20px; }
-
-        .search-wrapper {
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 5px;
-            display: flex;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .search-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 15px;
-            font-size: 16px;
-            color: #2C3E50;
-            outline: none;
-        }
-
-        .search-input::placeholder { color: rgba(44,62,80,0.5); }
-
-        .search-btn {
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            background: var(--aero-blue);
-            border: none;
             color: white;
-            font-size: 18px;
-            cursor: pointer;
         }
+
+        .header-btn:active { transform: scale(0.9); }
 
         .content { flex: 1; padding: 0 20px 20px; }
 
@@ -117,6 +110,17 @@
 
         .video-card:active { transform: scale(0.98); }
 
+        .video-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 20px 20px 0 0;
+        }
+
         .thumb-wrap {
             position: relative;
             width: 100%;
@@ -131,13 +135,18 @@
             object-fit: cover;
         }
 
-        .card-info { padding: 12px 15px; }
+        .card-info {
+            padding: 12px 15px;
+            position: relative;
+            z-index: 3;
+        }
 
         .card-title {
             font-size: 16px;
             font-weight: 600;
             color: #1a5276;
             margin-bottom: 5px;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
         }
 
         .card-meta {
@@ -153,6 +162,7 @@
             padding: 4px 10px;
             border-radius: 15px;
             font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .page { display: none; }
@@ -169,8 +179,12 @@
             font-weight: 600;
             cursor: pointer;
             margin-bottom: 15px;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .back-btn:active { transform: scale(0.95); }
 
         .player-wrap {
             background: #000;
@@ -181,7 +195,11 @@
             border: 2px solid rgba(255,255,255,0.2);
         }
 
-        .player { width: 100%; display: block; aspect-ratio: 16/9; }
+        .player {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+        }
 
         .details-card {
             background: var(--aero-glass);
@@ -193,9 +211,20 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
-        .details-card h2 { font-size: 20px; font-weight: 700; color: #1a5276; margin-bottom: 10px; }
+        .details-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a5276;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+        }
 
-        .actions { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
 
         .btn {
             background: var(--aero-glass);
@@ -214,6 +243,7 @@
             font-size: 14px;
         }
 
+        .btn:active { transform: scale(0.95); }
         .btn-like { background: var(--aero-green); }
         .btn-share { background: var(--aero-blue); }
 
@@ -228,7 +258,14 @@
         }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a5276; font-size: 14px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a5276;
+            font-size: 14px;
+        }
 
         .input {
             width: 100%;
@@ -243,6 +280,11 @@
             outline: none;
         }
 
+        .input:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 20px rgba(74,144,226,0.2);
+        }
+
         .file-label {
             display: flex;
             align-items: center;
@@ -252,10 +294,12 @@
             border: 2px dashed rgba(255,255,255,0.4);
             border-radius: 15px;
             cursor: pointer;
+            text-align: center;
             color: #5D6D7E;
             word-break: break-all;
         }
 
+        .file-label:active { background: rgba(255,255,255,0.6); }
         .file-input { display: none; }
 
         .submit-btn {
@@ -273,6 +317,7 @@
         }
 
         .submit-btn:disabled { opacity: 0.5; }
+        .submit-btn:active { transform: scale(0.95); }
 
         .progress {
             margin-top: 20px;
@@ -288,7 +333,8 @@
             background: var(--aero-green);
             border-radius: 15px;
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(39,174,96,0.5);
         }
 
         .toast {
@@ -328,6 +374,7 @@
             -webkit-backdrop-filter: blur(20px);
             border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         .empty-icon { font-size: 60px; margin-bottom: 15px; }
@@ -366,25 +413,28 @@
 
         .nav-btn.active { background: var(--aero-glass); }
         .nav-icon { font-size: 22px; }
+
+        @media (max-width: 320px) {
+            .card-title { font-size: 14px; }
+            .btn { padding: 8px 15px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
+    <div class="sun-flare"></div>
+
     <div class="app">
         <div class="header">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" alt="YouTuba" class="logo" onclick="showPage('main')">
             <button class="header-btn" onclick="showPage('upload')">⬆️</button>
         </div>
 
-        <div class="search-box" id="searchBox">
-            <div class="search-wrapper">
-                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Искать видео...">
-                <button class="search-btn" onclick="search()">🔍</button>
-            </div>
-        </div>
-
         <div class="content page active" id="page-main">
             <div class="video-list" id="videoList">
-                <div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>
+                <div class="empty">
+                    <div class="empty-icon">⏳</div>
+                    <h3>Загрузка видео...</h3>
+                </div>
             </div>
         </div>
 
@@ -397,8 +447,8 @@
             <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
             <form class="upload-form" id="uploadForm">
                 <div class="form-group">
-                    <label>📝 Название</label>
-                    <input type="text" class="input" id="titleInput" required placeholder="Название видео">
+                    <label>📝 Название видео</label>
+                    <input type="text" class="input" id="titleInput" required placeholder="Крутое видео">
                 </div>
                 <div class="form-group">
                     <label>👤 Автор</label>
@@ -429,91 +479,80 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Ваши данные GitHub
-        const GITHUB_TOKEN = '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';
-        const GITHUB_USER = 'tvink001v-ops';
-        const GITHUB_REPO = '-';
-        const VIDEOS_PATH = 'videos';
-        
-        // Загрузка списка видео из папки videos
+        const TOKEN = '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';
+        const USER = 'tvink001v-ops';
+        const REPO = '-';
+
         async function loadVideos(query = '') {
             const container = document.getElementById('videoList');
             container.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>';
-            
+
             try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}`, {
-                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+                const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos`, {
+                    headers: { 'Authorization': `token ${TOKEN}` }
                 });
-                
+
                 if (!res.ok) {
                     container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
                     return;
                 }
-                
+
                 const files = await res.json();
-                if (!Array.isArray(files)) {
-                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
-                    return;
-                }
-                
                 const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-                
-                if (jsonFiles.length === 0) {
+
+                if (!jsonFiles.length) {
                     container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
                     return;
                 }
-                
+
                 const videos = [];
                 for (const f of jsonFiles) {
                     try {
-                        const metaRes = await fetch(f.download_url);
-                        const v = await metaRes.json();
-                        videos.push(v);
+                        const r = await fetch(f.download_url);
+                        videos.push(await r.json());
                     } catch(e) {}
                 }
-                
+
                 videos.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                let filtered = query ? videos.filter(v => 
-                    v.title.toLowerCase().includes(query.toLowerCase()) || 
+
+                let filtered = query ? videos.filter(v =>
+                    v.title.toLowerCase().includes(query.toLowerCase()) ||
                     v.author.toLowerCase().includes(query.toLowerCase())
                 ) : videos;
-                
-                if (filtered.length === 0) {
-                    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>Ничего не найдено</h3></div>`;
+
+                if (!filtered.length) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><h3>Ничего не найдено</h3></div>';
                     return;
                 }
-                
+
                 container.innerHTML = filtered.map(v => `
                     <div class="video-card" onclick="openVideo('${v.id}')">
                         <div class="thumb-wrap">
-                            <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" 
-                                 alt="${v.title}" class="thumb">
+                            <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><circle cx="240" cy="40" r="30" fill="white" opacity="0.3"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" class="thumb">
                         </div>
                         <div class="card-info">
                             <div class="card-title">${v.title}</div>
                             <div class="card-meta">
                                 <span>👤 ${v.author}</span>
-                                <span class="badge">👁 ${v.views || 0} • ❤️ ${v.likes || 0}</span>
+                                <span class="badge">👁 ${v.views||0} • ❤️ ${v.likes||0}</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                
+
             } catch(e) {
                 console.error(e);
-                container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>${e.message}</p></div>`;
+                container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>Проверьте консоль</p></div>';
             }
         }
-        
-        // Открыть видео
+
         async function openVideo(id) {
             try {
-                const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${VIDEOS_PATH}/${id}.json`);
+                const res = await fetch(`https://raw.githubusercontent.com/${USER}/${REPO}/main/videos/${id}.json`);
                 const v = await res.json();
-                
+
                 showPage('video');
-                
+
                 document.getElementById('videoContent').innerHTML = `
                     <div class="player-wrap">
                         <video class="player" controls autoplay playsinline>
@@ -523,99 +562,130 @@
                     <div class="details-card">
                         <h2>${v.title}</h2>
                         <div style="color:#5D6D7E;margin-bottom:10px;">
-                            <strong>${v.author}</strong> • ${v.views || 0} просмотров • ${new Date(v.date).toLocaleDateString('ru-RU')}
+                            <strong>${v.author}</strong> • ${v.views||0} просмотров
+                        </div>
+                        <div style="color:#7F8C8D;font-size:12px;">
+                            ${new Date(v.date).toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'})}
                         </div>
                         <div class="actions">
-                            <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes || 0}</button>
+                            <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes||0}</button>
                             <button class="btn btn-share" onclick="shareVideo()">📤 Поделиться</button>
                         </div>
                     </div>
                 `;
-                
+
                 window.scrollTo(0, 0);
             } catch(e) {
                 toast('Ошибка загрузки видео', 'error');
             }
         }
-        
+
         async function likeVideo(id) {
-            toast('❤️ Спасибо!', 'success');
+            try {
+                const res = await fetch(`https://raw.githubusercontent.com/${USER}/${REPO}/main/videos/${id}.json`);
+                const v = await res.json();
+                v.likes = (v.likes||0) + 1;
+                
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(v))));
+                
+                await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `❤️ Лайк: ${v.title}`,
+                        content: content,
+                        sha: await getFileSha(id)
+                    })
+                });
+                
+                openVideo(id);
+                toast('❤️ Спасибо!');
+            } catch(e) {
+                toast('Ошибка', 'error');
+            }
         }
-        
+
+        async function getFileSha(id) {
+            const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
+                headers: { 'Authorization': `token ${TOKEN}` }
+            });
+            const data = await res.json();
+            return data.sha;
+        }
+
         function shareVideo() {
             if (navigator.share) {
                 navigator.share({ url: window.location.href }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(window.location.href);
-                toast('📋 Ссылка скопирована!', 'success');
+                toast('📋 Ссылка скопирована!');
             }
         }
-        
-        // Загрузка видео
+
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const file = document.getElementById('videoInput').files[0];
             if (!file) return;
-            
+
             const submitBtn = document.getElementById('submitBtn');
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
-            
+
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Чтение...';
+            submitBtn.textContent = '⏳ Чтение файла...';
             progressBar.style.display = 'block';
             progressFill.style.width = '10%';
-            
+
             const reader = new FileReader();
-            
+
             reader.onprogress = (e) => {
                 if (e.lengthComputable) {
-                    progressFill.style.width = (10 + (e.loaded / e.total) * 30) + '%';
+                    progressFill.style.width = (10 + (e.loaded/e.total)*30) + '%';
                 }
             };
-            
+
             reader.onload = async function(e) {
-                progressFill.style.width = '40%';
+                progressFill.style.width = '50%';
                 submitBtn.textContent = '⏳ Сохранение в GitHub...';
-                
-                const videoBase64 = e.target.result;
+
                 const id = Date.now().toString();
                 const metadata = {
                     id: id,
                     title: document.getElementById('titleInput').value.trim(),
                     author: document.getElementById('authorInput').value.trim() || 'Аноним',
-                    videoUrl: videoBase64,
+                    videoUrl: e.target.result,
                     views: 0,
                     likes: 0,
                     date: new Date().toISOString()
                 };
-                
+
                 const content = btoa(unescape(encodeURIComponent(JSON.stringify(metadata))));
-                
+
                 try {
-                    progressFill.style.width = '60%';
-                    
-                    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}/${id}.json`, {
+                    const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Authorization': `token ${TOKEN}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: `🎬 Добавлено: ${metadata.title}`,
+                            message: `🎬 Новое видео: ${metadata.title}`,
                             content: content
                         })
                     });
-                    
+
                     if (!res.ok) {
                         const err = await res.json();
                         throw new Error(err.message);
                     }
-                    
+
                     progressFill.style.width = '100%';
-                    toast('✅ Видео сохранено в папку videos/', 'success');
-                    
+                    toast('✅ Видео сохранено в папку videos/');
+
                     setTimeout(() => {
                         document.getElementById('uploadForm').reset();
                         document.getElementById('videoLabel').textContent = '📁 Выбрать видео';
@@ -625,7 +695,7 @@
                         submitBtn.textContent = '✨ Загрузить видео';
                         showPage('main');
                     }, 1000);
-                    
+
                 } catch(err) {
                     toast('❌ ' + err.message, 'error');
                     submitBtn.disabled = false;
@@ -633,30 +703,27 @@
                     progressBar.style.display = 'none';
                 }
             };
-            
+
             reader.readAsDataURL(file);
         });
-        
+
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-' + page).classList.add('active');
+
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-            document.getElementById('searchBox').style.display = page === 'main' ? 'block' : 'none';
+
             if (page === 'main') loadVideos();
         }
-        
-        function search() {
-            loadVideos(document.getElementById('searchInput').value.trim());
-        }
-        
+
         function toast(msg, type = 'success') {
             const t = document.getElementById('toast');
             t.textContent = msg;
-            t.className = 'toast show ' + type;
+            t.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
-        
+
         document.getElementById('videoInput').addEventListener('change', function() {
             const label = document.getElementById('videoLabel');
             if (this.files[0]) {
@@ -666,11 +733,7 @@
                 }
             }
         });
-        
-        document.getElementById('searchInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') search();
-        });
-        
+
         loadVideos();
     </script>
 </body>
