@@ -7,54 +7,49 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Создаем папки, если их нет
+// Создаем папки
 const uploadsDir = path.join(__dirname, 'uploads');
 const thumbnailsDir = path.join(__dirname, 'thumbnails');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 if (!fs.existsSync(thumbnailsDir)) fs.mkdirSync(thumbnailsDir);
 
-// База данных видео (простой JSON файл)
+// База данных
 const DB_PATH = path.join(__dirname, 'videos.json');
 if (!fs.existsSync(DB_PATH)) {
   fs.writeFileSync(DB_PATH, JSON.stringify([], null, 2));
 }
 
-// Настройка хранилища для видео
+// Хранилище
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if (file.fieldname === 'video') {
-      cb(null, uploadsDir);
-    } else if (file.fieldname === 'thumbnail') {
-      cb(null, thumbnailsDir);
-    }
+    if (file.fieldname === 'video') cb(null, uploadsDir);
+    else if (file.fieldname === 'thumbnail') cb(null, thumbnailsDir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
 const upload = multer({
   storage: storage,
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB для мобильных видео
   fileFilter: (req, file, cb) => {
     if (file.fieldname === 'video') {
-      const videoTypes = /mp4|webm|ogg|mov|avi|mkv/;
+      const videoTypes = /mp4|webm|ogg|mov|3gp|mkv/;
       const extname = videoTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimetype = file.mimetype.startsWith('video/');
-      if (extname && mimetype) {
-        return cb(null, true);
+      if (extname && file.mimetype.startsWith('video/')) {
+        cb(null, true);
       } else {
-        cb(new Error('Поддерживаются только видео файлы (mp4, webm, ogg, mov, avi, mkv)'));
+        cb(new Error('Только видео файлы (mp4, webm, ogg, mov, 3gp, mkv)'));
       }
     } else if (file.fieldname === 'thumbnail') {
       const imageTypes = /jpeg|jpg|png|gif|webp/;
       const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimetype = file.mimetype.startsWith('image/');
-      if (extname && mimetype) {
-        return cb(null, true);
+      if (extname && file.mimetype.startsWith('image/')) {
+        cb(null, true);
       } else {
-        cb(new Error('Поддерживаются только изображения (jpg, png, gif, webp)'));
+        cb(new Error('Только изображения (jpg, png, gif, webp)'));
       }
     }
   }
@@ -66,7 +61,7 @@ app.use(express.static('public'));
 app.use('/uploads', express.static(uploadsDir));
 app.use('/thumbnails', express.static(thumbnailsDir));
 
-// Получить все видео
+// API endpoints
 app.get('/api/videos', (req, res) => {
   try {
     const videos = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -76,7 +71,6 @@ app.get('/api/videos', (req, res) => {
   }
 });
 
-// Загрузить новое видео
 app.post('/api/upload', upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
@@ -95,12 +89,11 @@ app.post('/api/upload', upload.fields([
       description: req.body.description || '',
       author: req.body.author || 'Аноним',
       videoUrl: `/uploads/${videoFile.filename}`,
-      thumbnailUrl: thumbnailFile ? `/thumbnails/${thumbnailFile.filename}` : '/default-thumbnail.jpg',
+      thumbnailUrl: thumbnailFile ? `/thumbnails/${thumbnailFile.filename}` : '/default-thumb.jpg',
       views: 0,
       likes: 0,
-      dislikes: 0,
       uploadDate: new Date().toISOString(),
-      duration: '0:00'
+      duration: req.body.duration || '0:00'
     };
 
     const videos = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -109,20 +102,16 @@ app.post('/api/upload', upload.fields([
 
     res.status(201).json(newVideo);
   } catch (err) {
-    res.status(500).json({ error: 'Ошибка загрузки видео: ' + err.message });
+    res.status(500).json({ error: 'Ошибка загрузки: ' + err.message });
   }
 });
 
-// Получить конкретное видео
 app.get('/api/videos/:id', (req, res) => {
   try {
     const videos = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
     const video = videos.find(v => v.id === req.params.id);
-    if (!video) {
-      return res.status(404).json({ error: 'Видео не найдено' });
-    }
+    if (!video) return res.status(404).json({ error: 'Видео не найдено' });
     
-    // Увеличиваем счетчик просмотров
     video.views = (video.views || 0) + 1;
     const index = videos.findIndex(v => v.id === req.params.id);
     videos[index] = video;
@@ -134,18 +123,14 @@ app.get('/api/videos/:id', (req, res) => {
   }
 });
 
-// Лайк/дизлайк
 app.post('/api/videos/:id/like', (req, res) => {
   try {
     const videos = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
     const video = videos.find(v => v.id === req.params.id);
     if (!video) return res.status(404).json({ error: 'Видео не найдено' });
     
-    if (req.body.type === 'like') {
-      video.likes = (video.likes || 0) + 1;
-    } else if (req.body.type === 'dislike') {
-      video.dislikes = (video.dislikes || 0) + 1;
-    }
+    if (req.body.type === 'like') video.likes = (video.likes || 0) + 1;
+    else if (req.body.type === 'dislike') video.dislikes = (video.dislikes || 0) + 1;
     
     const index = videos.findIndex(v => v.id === req.params.id);
     videos[index] = video;
@@ -153,12 +138,10 @@ app.post('/api/videos/:id/like', (req, res) => {
     
     res.json(video);
   } catch (err) {
-    res.status(500).json({ error: 'Ошибка обработки лайка' });
+    res.status(500).json({ error: 'Ошибка обработки' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`🎥 Old YouTube server running on http://localhost:${PORT}`);
-  console.log(`📁 Upload videos at http://localhost:${PORT}/upload.html`);
-  console.log(`🏠 Watch videos at http://localhost:${PORT}`);
+  console.log(`🌟 Frutiger Aero YouTube Mobile running on http://localhost:${PORT}`);
 });
