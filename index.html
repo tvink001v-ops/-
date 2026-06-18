@@ -6,11 +6,12 @@
     <title>YouTuba</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:Arial,sans-serif;background:linear-gradient(180deg,#87CEEB,#4A90E2);min-height:100vh;color:#2C3E50}
+        body{font-family:Arial,sans-serif;background:linear-gradient(180deg,#87CEEB,#4A90E2,#2E5FA1);min-height:100vh;color:#2C3E50}
         .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
         .header{background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);padding:15px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;border-radius:0 0 20px 20px}
         .logo{height:28px;cursor:pointer}
         .btn{padding:10px 20px;border-radius:25px;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px}
+        .btn:active{transform:scale(0.95)}
         .btn-up{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
         .content{flex:1;padding:20px}
         .card{background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);border-radius:20px;padding:15px;margin-bottom:15px;cursor:pointer}
@@ -39,7 +40,6 @@
         .nav{position:sticky;bottom:0;background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);padding:15px;display:flex;justify-content:space-around;border-radius:20px 20px 0 0}
         .nav-btn{background:none;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;padding:10px 20px;border-radius:20px}
         .nav-btn.active{background:rgba(255,255,255,0.3)}
-        .loading-text{text-align:center;padding:40px;color:white;font-size:18px}
     </style>
 </head>
 <body>
@@ -50,6 +50,7 @@
         </div>
 
         <div class="content page active" id="main">
+            <button class="btn" style="background:#5DADE2;margin-bottom:15px;" onclick="loadVideos()">🔄 Обновить</button>
             <div id="list"></div>
         </div>
 
@@ -64,7 +65,7 @@
             <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео</label>
             <input type="file" class="file-inp" id="file" accept="video/*">
             <div class="progress" id="bar"><div class="progress-fill" id="fill"></div></div>
-            <button class="green-btn" id="submitBtn" onclick="upload()">✨ Загрузить</button>
+            <button class="green-btn" onclick="upload()">✨ Загрузить</button>
         </div>
 
         <div class="nav">
@@ -91,7 +92,7 @@
                 }
                 
                 list.innerHTML = videos.map(v => `
-                    <div class="card" onclick="openVideo('${v.id}','${v.name.replace(/'/g,"\\'")}','${v.type}')">
+                    <div class="card" onclick="openVideo('${v.id}')">
                         <h3>🎬 ${v.name}</h3>
                         <p><span class="badge">👁 ${v.views||0}</span> <span class="badge">❤️ ${v.likes||0}</span></p>
                     </div>
@@ -101,50 +102,33 @@
             }
         }
 
-        async function openVideo(id, name, type) {
-            show('video');
-            document.getElementById('player').innerHTML = '<div class="loading-text">⏳ Загрузка видео...</div>';
-            
-            try {
-                // Скачиваем видео как временный файл
-                const res = await fetch(`${SCRIPT}?download=${id}`);
-                const base64 = await res.text();
-                
-                // Создаём blob и проигрываем
-                const blob = new Blob(
-                    [Uint8Array.from(atob(base64), c => c.charCodeAt(0))],
-                    { type: type }
-                );
-                const url = URL.createObjectURL(blob);
-                
-                // Получаем статистику
-                const info = await fetch(`${SCRIPT}?id=${id}`);
-                const data = await info.json();
-                
-                document.getElementById('player').innerHTML = `
-                    <video controls autoplay playsinline onended="this.remove();URL.revokeObjectURL('${url}')">
-                        <source src="${url}" type="${type}">
-                    </video>
-                    <div class="details">
-                        <h2>${name}</h2>
-                        <p style="color:#5D6D7E;">👁 ${data.views} просмотров</p>
-                        <button class="btn btn-like" onclick="like('${id}')">❤️ ${data.likes}</button>
-                    </div>
-                `;
-            } catch(e) {
-                document.getElementById('player').innerHTML = '<div class="empty">❌ Ошибка загрузки</div>';
-            }
+        function openVideo(id) {
+            fetch(`${SCRIPT}?id=${id}`)
+                .then(r => r.json())
+                .then(v => {
+                    show('video');
+                    document.getElementById('player').innerHTML = `
+                        <video controls autoplay playsinline>
+                            <source src="${v.downloadUrl}" type="video/mp4">
+                        </video>
+                        <div class="details">
+                            <h2>${v.name}</h2>
+                            <p style="color:#5D6D7E;">👁 ${v.views} просмотров</p>
+                            <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes}</button>
+                        </div>
+                    `;
+                });
         }
 
         function like(id) {
-            fetch(`${SCRIPT}?like=${id}`).then(() => openVideo(id));
+            fetch(`${SCRIPT}?action=like&id=${id}`).then(() => openVideo(id));
         }
 
         function upload() {
             const file = document.getElementById('file').files[0];
             if (!file) return;
 
-            const btn = document.getElementById('submitBtn');
+            const btn = document.querySelector('.green-btn');
             const bar = document.getElementById('bar');
             const fill = document.getElementById('fill');
             
@@ -170,7 +154,6 @@
                 
                 fill.style.width = '100%';
                 toast('✅ Загружено!');
-                
                 setTimeout(() => {
                     document.getElementById('file').value = '';
                     document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
