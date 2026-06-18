@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>YouTuba • Frutiger Aero</title>
+    <style>
+        :root {
+            --aero-sky: linear-gradient(180deg, #87CEEB 0%, #4A90E2 50%, #2E5FA1 100%);
+            --aero-glass: rgba(255,255,255,0.45);
+            --aero-green: linear-gradient(180deg, #7DCEA0 0%, #27AE60 100%);
+            --aero-blue: linear-gradient(180deg, #5DADE2 0%, #2E86C1 100%);
+            --aero-red: linear-gradient(180deg, #F1948A 0%, #E74C3C 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--aero-sky);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2C3E50;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-radius: 0 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo { height: 28px; cursor: pointer; }
+
+        .header-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--aero-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.4);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box { padding: 15px 20px; }
+
+        .search-wrapper {
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 5px;
+            display: flex;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 15px;
+            font-size: 16px;
+            color: #2C3E50;
+            outline: none;
+        }
+
+        .search-input::placeholder { color: rgba(44,62,80,0.5); }
+
+        .search-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: var(--aero-blue);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .content { flex: 1; padding: 0 20px 20px; }
+
+        .video-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .video-card {
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .video-card:active { transform: scale(0.98); }
+
+        .thumb-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+        }
+
+        .thumb {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .card-info { padding: 12px 15px; position: relative; z-index: 3; }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a5276;
+            margin-bottom: 5px;
+        }
+
+        .card-meta {
+            font-size: 13px;
+            color: #5D6D7E;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.3);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .back-btn {
+            background: var(--aero-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .player-wrap {
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .player { width: 100%; display: block; aspect-ratio: 16/9; }
+
+        .details-card {
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .details-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a5276;
+            margin-bottom: 10px;
+        }
+
+        .actions { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+
+        .btn {
+            background: var(--aero-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn-like { background: var(--aero-green); }
+        .btn-share { background: var(--aero-blue); }
+        .btn-delete { background: var(--aero-red); }
+
+        .upload-form {
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a5276;
+            font-size: 14px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 16px;
+            color: #2C3E50;
+            outline: none;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: var(--aero-glass);
+            border: 2px dashed rgba(255,255,255,0.4);
+            border-radius: 15px;
+            cursor: pointer;
+            color: #5D6D7E;
+            word-break: break-all;
+        }
+
+        .file-input { display: none; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--aero-green);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(39,174,96,0.4);
+            margin-top: 20px;
+        }
+
+        .submit-btn:disabled { opacity: 0.5; }
+        .submit-btn:active { transform: scale(0.95); }
+
+        .progress {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            height: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--aero-green);
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 25px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .toast.show { display: block; animation: slideUp 0.5s ease; }
+        .toast.success { background: var(--aero-green); }
+        .toast.error { background: var(--aero-red); }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .empty-icon { font-size: 60px; margin-bottom: 15px; }
+        .empty h3 { font-size: 18px; color: #5D6D7E; margin-bottom: 10px; }
+        .empty p { color: #7F8C8D; font-size: 14px; }
+
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            background: var(--aero-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.4);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+            border-radius: 20px 20px 0 0;
+            margin-top: auto;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .nav-btn.active { background: var(--aero-glass); }
+        .nav-icon { font-size: 22px; }
+
+        .token-box {
+            background: rgba(255,255,200,0.4);
+            border: 1px solid rgba(255,200,0,0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 13px;
+            color: #6D4C00;
+        }
+
+        .token-box input { margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" alt="YouTuba" class="logo" onclick="showPage('main')">
+            <button class="header-btn" onclick="showPage('upload')">⬆️</button>
+        </div>
+
+        <div class="search-box" id="searchBox">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Искать видео...">
+                <button class="search-btn" onclick="search()">🔍</button>
+            </div>
+        </div>
+
+        <div class="content page active" id="page-main">
+            <div class="video-list" id="videoList">
+                <div class="empty">
+                    <div class="empty-icon">⏳</div>
+                    <h3>Загрузка...</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="content page" id="page-video">
+            <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
+            <div id="videoContent"></div>
+        </div>
+
+        <div class="content page" id="page-upload">
+            <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
+            <div class="token-box" id="tokenBox" style="display:none;">
+                ⚠️ <strong>Нужен GitHub токен</strong><br>
+                <small>Создайте токен с правами <code>repo</code> на <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></small>
+                <input type="password" class="input" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx" style="margin-top:8px;">
+                <button class="btn" onclick="saveToken()" style="margin-top:8px;">💾 Сохранить</button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>📝 Название</label>
+                    <input type="text" class="input" id="titleInput" required placeholder="Название видео">
+                </div>
+                <div class="form-group">
+                    <label>👤 Автор</label>
+                    <input type="text" class="input" id="authorInput" placeholder="Ваше имя" value="Аноним">
+                </div>
+                <div class="form-group">
+                    <label>🎥 Видео (до 100MB)</label>
+                    <label class="file-label" for="videoInput" id="videoLabel">📁 Выбрать видео</label>
+                    <input type="file" class="file-input" id="videoInput" accept="video/*" required>
+                </div>
+                <div class="progress" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">✨ Загрузить видео</button>
+            </form>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn active" data-page="main" onclick="showPage('main')">
+                <span class="nav-icon">🏠</span> Главная
+            </button>
+            <button class="nav-btn" data-page="upload" onclick="showPage('upload')">
+                <span class="nav-icon">⬆️</span> Загрузить
+            </button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Конфигурация GitHub
+        const GITHUB_USER = 'tvink001v-ops';
+        const GITHUB_REPO = '-';
+        const VIDEOS_PATH = 'videos';
+        
+        let githubToken = localStorage.getItem('github_token');
+        
+        // Загрузка списка видео из GitHub
+        async function loadVideos(query = '') {
+            const container = document.getElementById('videoList');
+            container.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>';
+            
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}`;
+                const headers = githubToken ? { 'Authorization': `token ${githubToken}` } : {};
+                
+                const res = await fetch(url, { headers });
+                
+                if (res.status === 403 && !githubToken) {
+                    container.innerHTML = `
+                        <div class="empty">
+                            <div class="empty-icon">🔐</div>
+                            <h3>Нужен GitHub токен</h3>
+                            <p>Нажмите "Загрузить" и добавьте токен</p>
+                        </div>`;
+                    return;
+                }
+                
+                const files = await res.json();
+                
+                if (!Array.isArray(files)) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
+                    return;
+                }
+                
+                // Фильтруем JSON файлы
+                const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+                
+                // Загружаем метаданные
+                const videos = await Promise.all(jsonFiles.map(async f => {
+                    const metaRes = await fetch(f.download_url);
+                    return await metaRes.json();
+                }));
+                
+                let filtered = videos;
+                if (query) {
+                    const q = query.toLowerCase();
+                    filtered = videos.filter(v => 
+                        v.title.toLowerCase().includes(q) || 
+                        v.author.toLowerCase().includes(q)
+                    );
+                }
+                
+                if (filtered.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty">
+                            <div class="empty-icon">${query ? '🔍' : '📭'}</div>
+                            <h3>${query ? 'Ничего не найдено' : 'Нет видео'}</h3>
+                            <p>${query ? 'Другой запрос' : 'Загрузите первое!'}</p>
+                        </div>`;
+                    return;
+                }
+                
+                container.innerHTML = filtered.map(v => `
+                    <div class="video-card" onclick="openVideo('${v.id}')">
+                        <div class="thumb-wrap">
+                            <img src="${v.thumbnail || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 180%22><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%220%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%2387CEEB%22/><stop offset=%22100%25%22 stop-color=%22%234A90E2%22/></linearGradient></defs><rect fill=%22url(#g)%22 width=%22320%22 height=%22180%22/><text fill=%22white%22 font-size=%2250%22 x=%22160%22 y=%22100%22 text-anchor=%22middle%22>🎬</text></svg>')}" 
+                                 alt="${v.title}" class="thumb">
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">${v.title}</div>
+                            <div class="card-meta">
+                                <span>👤 ${v.author}</span>
+                                <span class="badge">❤️ ${v.likes || 0} • 👁 ${v.views || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>' + e.message + '</p></div>';
+            }
+        }
+        
+        // Открыть видео
+        async function openVideo(id) {
+            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${VIDEOS_PATH}/${id}.json`;
+            const res = await fetch(url);
+            const v = await res.json();
+            
+            showPage('video');
+            
+            document.getElementById('videoContent').innerHTML = `
+                <div class="player-wrap">
+                    <video class="player" controls autoplay playsinline>
+                        <source src="${v.videoUrl}" type="video/mp4">
+                    </video>
+                </div>
+                <div class="details-card">
+                    <h2>${v.title}</h2>
+                    <div style="color:#5D6D7E;margin-bottom:10px;">
+                        <strong>${v.author}</strong> • ${(v.views || 0) + 1} просмотров
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes || 0}</button>
+                        <button class="btn btn-share" onclick="shareVideo()">📤 Поделиться</button>
+                    </div>
+                </div>
+            `;
+            
+            window.scrollTo(0, 0);
+        }
+        
+        // Лайк
+        async function likeVideo(id) {
+            toast('❤️ Спасибо!', 'success');
+        }
+        
+        // Поделиться
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({ url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                toast('📋 Ссылка скопирована!', 'success');
+            }
+        }
+        
+        // Токен
+        function saveToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (token) {
+                githubToken = token;
+                localStorage.setItem('github_token', token);
+                document.getElementById('tokenBox').style.display = 'none';
+                toast('✅ Токен сохранён!', 'success');
+            }
+        }
+        
+        // Загрузка видео в GitHub
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!githubToken) {
+                document.getElementById('tokenBox').style.display = 'block';
+                toast('⚠️ Нужен GitHub токен!', 'error');
+                return;
+            }
+            
+            const file = document.getElementById('videoInput').files[0];
+            if (!file) return;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Чтение файла...';
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            const reader = new FileReader();
+            
+            reader.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const pct = (e.loaded / e.total) * 50;
+                    progressFill.style.width = pct + '%';
+                }
+            };
+            
+            reader.onload = async function(e) {
+                progressFill.style.width = '50%';
+                submitBtn.textContent = '⏳ Загрузка в GitHub...';
+                
+                const videoBase64 = e.target.result;
+                const id = Date.now().toString();
+                const title = document.getElementById('titleInput').value.trim();
+                const author = document.getElementById('authorInput').value.trim() || 'Аноним';
+                
+                // Сохраняем метаданные (без видео, только ссылка)
+                const metadata = {
+                    id: id,
+                    title: title,
+                    author: author,
+                    videoUrl: videoBase64,
+                    thumbnail: null,
+                    views: 0,
+                    likes: 0,
+                    date: new Date().toISOString()
+                };
+                
+                try {
+                    // Сохраняем JSON с метаданными
+                    const metaRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${VIDEOS_PATH}/${id}.json`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${githubToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `🎬 Добавлено видео: ${title}`,
+                            content: btoa(unescape(encodeURIComponent(JSON.stringify(metadata))))
+                        })
+                    });
+                    
+                    if (!metaRes.ok) {
+                        const err = await metaRes.json();
+                        throw new Error(err.message);
+                    }
+                    
+                    progressFill.style.width = '100%';
+                    toast('✅ Видео загружено в папку videos/', 'success');
+                    
+                    setTimeout(() => {
+                        document.getElementById('uploadForm').reset();
+                        document.getElementById('videoLabel').textContent = '📁 Выбрать видео';
+                        progressBar.style.display = 'none';
+                        progressFill.style.width = '0%';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '✨ Загрузить видео';
+                        showPage('main');
+                    }, 1500);
+                    
+                } catch(err) {
+                    toast('❌ ' + err.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✨ Загрузить видео';
+                    progressBar.style.display = 'none';
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        });
+        
+        // Навигация
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+            
+            document.getElementById('searchBox').style.display = page === 'main' ? 'block' : 'none';
+            
+            if (page === 'main') loadVideos();
+        }
+        
+        function search() {
+            loadVideos(document.getElementById('searchInput').value.trim());
+        }
+        
+        function toast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        
+        document.getElementById('videoInput').addEventListener('change', function() {
+            const label = document.getElementById('videoLabel');
+            if (this.files[0]) {
+                label.textContent = '📁 ' + this.files[0].name;
+                if (!document.getElementById('titleInput').value) {
+                    document.getElementById('titleInput').value = this.files[0].name.replace(/\.[^/.]+$/, "");
+                }
+            }
+        });
+        
+        document.getElementById('searchInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') search();
+        });
+        
+        // Показываем токен если есть
+        if (githubToken) {
+            document.getElementById('tokenInput').value = githubToken;
+        }
+        
+        loadVideos();
+    </script>
+</body>
+</html>
