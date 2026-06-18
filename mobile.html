@@ -44,7 +44,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Декоративные облака */
         body::before {
             content: '';
             position: fixed;
@@ -60,7 +59,6 @@
             z-index: 0;
         }
 
-        /* Солнечные блики */
         .sun-flare {
             position: fixed;
             top: -50px;
@@ -73,7 +71,6 @@
             z-index: 0;
         }
 
-        /* Контейнер приложения */
         .app-container {
             position: relative;
             z-index: 1;
@@ -84,7 +81,6 @@
             flex-direction: column;
         }
 
-        /* Хедер в стиле Frutiger Aero */
         .aero-header {
             background: var(--aero-glass-strong);
             backdrop-filter: blur(20px);
@@ -150,7 +146,6 @@
             background: rgba(255,255,255,0.5);
         }
 
-        /* Строка поиска */
         .search-container {
             padding: 15px 20px;
         }
@@ -204,13 +199,11 @@
             transform: scale(0.9);
         }
 
-        /* Контент */
         .content {
             flex: 1;
             padding: 0 20px 20px;
         }
 
-        /* Видео карточки */
         .video-list {
             display: flex;
             flex-direction: column;
@@ -234,7 +227,6 @@
             transform: scale(0.98);
         }
 
-        /* Глянцевый эффект на карточке */
         .video-card::before {
             content: '';
             position: absolute;
@@ -324,7 +316,6 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Видео плеер */
         .video-page {
             display: none;
             padding: 0 20px 20px;
@@ -452,7 +443,6 @@
             white-space: pre-wrap;
         }
 
-        /* Страница загрузки */
         .upload-page {
             display: none;
             padding: 0 20px 20px;
@@ -527,6 +517,7 @@
             text-align: center;
             color: #5D6D7E;
             transition: all 0.3s ease;
+            word-break: break-all;
         }
 
         .file-input-label:active {
@@ -567,7 +558,6 @@
             transform: none;
         }
 
-        /* Прогресс бар */
         .progress-container {
             margin-top: 20px;
             background: rgba(255,255,255,0.3);
@@ -586,7 +576,6 @@
             box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
         }
 
-        /* Сообщения */
         .message-toast {
             position: fixed;
             bottom: 30px;
@@ -631,7 +620,6 @@
             }
         }
 
-        /* Пустое состояние */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -659,7 +647,6 @@
             font-size: 14px;
         }
 
-        /* Нижняя навигация */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -700,7 +687,18 @@
             font-size: 22px;
         }
 
-        /* Адаптация под очень маленькие экраны */
+        .note-box {
+            background: rgba(255, 200, 50, 0.3);
+            border: 1px solid rgba(255, 200, 50, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 13px;
+            color: #6D4C00;
+        }
+
         @media (max-width: 320px) {
             .video-title {
                 font-size: 14px;
@@ -716,7 +714,6 @@
     <div class="sun-flare"></div>
     
     <div class="app-container">
-        <!-- Хедер -->
         <header class="aero-header">
             <div class="header-content">
                 <div class="logo-container">
@@ -725,17 +722,12 @@
                          class="logo-img">
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn" onclick="showUploadPage()" title="Загрузить видео">
-                        ⬆️
-                    </button>
-                    <button class="icon-btn" onclick="refreshVideos()" title="Обновить">
-                        🔄
-                    </button>
+                    <button class="icon-btn" onclick="showUploadPage()" title="Добавить видео">⬆️</button>
+                    <button class="icon-btn" onclick="refreshVideos()" title="Обновить">🔄</button>
                 </div>
             </div>
         </header>
 
-        <!-- Поиск -->
         <div class="search-container" id="searchContainer">
             <div class="search-wrapper">
                 <input type="text" class="search-input" id="searchInput" placeholder="🔍 Искать видео...">
@@ -743,63 +735,55 @@
             </div>
         </div>
 
-        <!-- Главная страница -->
         <div class="content main-page" id="mainPage">
+            <div class="note-box">
+                💡 <strong>Видео хранятся локально</strong> в вашем браузере (localStorage). Они доступны только на этом устройстве.
+            </div>
             <div class="video-list" id="videoList">
                 <div class="empty-state">
                     <div class="icon">🎬</div>
-                    <h3>Загрузка видео...</h3>
-                    <p>Подождите немного ✨</p>
+                    <h3>Нет видео</h3>
+                    <p>Загрузите первое видео! ⬆️</p>
                 </div>
             </div>
         </div>
 
-        <!-- Страница видео -->
         <div class="video-page" id="videoPage">
-            <button class="back-button" onclick="goBack()">
-                ⬅️ Назад
-            </button>
+            <button class="back-button" onclick="goBack()">⬅️ Назад</button>
             <div id="videoContent"></div>
         </div>
 
-        <!-- Страница загрузки -->
         <div class="upload-page" id="uploadPage">
-            <button class="back-button" onclick="goBack()">
-                ⬅️ Назад
-            </button>
-            <form class="upload-form" id="uploadForm" enctype="multipart/form-data">
+            <button class="back-button" onclick="goBack()">⬅️ Назад</button>
+            <form class="upload-form" id="uploadForm">
                 <div class="form-group">
                     <label>📝 Название видео</label>
-                    <input type="text" class="aero-input" name="title" required placeholder="Крутое видео">
+                    <input type="text" class="aero-input" id="videoTitle" required placeholder="Крутое видео">
                 </div>
                 
                 <div class="form-group">
                     <label>📋 Описание</label>
-                    <textarea class="aero-input aero-textarea" name="description" placeholder="Расскажите о видео..."></textarea>
+                    <textarea class="aero-input aero-textarea" id="videoDesc" placeholder="Расскажите о видео..."></textarea>
                 </div>
                 
                 <div class="form-group">
                     <label>👤 Ваше имя</label>
-                    <input type="text" class="aero-input" name="author" placeholder="Ваше имя" value="Аноним">
+                    <input type="text" class="aero-input" id="videoAuthor" placeholder="Ваше имя" value="Аноним">
                 </div>
                 
                 <div class="form-group">
                     <label>🎥 Видео файл</label>
                     <div class="file-input-wrapper">
-                        <div class="file-input-label">
-                            📁 Выберите видео файл
-                        </div>
-                        <input type="file" class="file-input" name="video" accept="video/*" required id="videoFile">
+                        <div class="file-input-label" id="videoFileLabel">📁 Выберите видео файл</div>
+                        <input type="file" class="file-input" id="videoFile" accept="video/*" required>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label>🖼 Превью (картинка)</label>
                     <div class="file-input-wrapper">
-                        <div class="file-input-label">
-                            🖼 Выберите превью
-                        </div>
-                        <input type="file" class="file-input" name="thumbnail" accept="image/*" id="thumbFile">
+                        <div class="file-input-label" id="thumbFileLabel">🖼 Выберите превью</div>
+                        <input type="file" class="file-input" id="thumbFile" accept="image/*">
                     </div>
                 </div>
                 
@@ -807,38 +791,58 @@
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    ✨ Загрузить видео
-                </button>
+                <button type="submit" class="submit-btn" id="submitBtn">✨ Загрузить видео</button>
             </form>
         </div>
 
-        <!-- Навигация -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-page="main" onclick="showMainPage()">
-                <span class="nav-icon">🏠</span>
-                Главная
+                <span class="nav-icon">🏠</span> Главная
             </button>
             <button class="nav-item" data-page="upload" onclick="showUploadPage()">
-                <span class="nav-icon">⬆️</span>
-                Загрузить
+                <span class="nav-icon">⬆️</span> Загрузить
             </button>
             <button class="nav-item" onclick="refreshVideos()">
-                <span class="nav-icon">🔄</span>
-                Обновить
+                <span class="nav-icon">🔄</span> Обновить
             </button>
         </nav>
     </div>
 
-    <!-- Toast сообщения -->
     <div class="message-toast" id="messageToast"></div>
 
     <script>
-        const API_URL = '';
-        let currentPage = 'main';
-        let currentVideoId = null;
+        // Локальное хранилище вместо сервера
+        const STORAGE_KEY = 'youtuba_videos';
+        
+        function getVideos() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+        
+        function saveVideos(videos) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+        }
+        
+        function addVideo(video) {
+            const videos = getVideos();
+            videos.unshift(video);
+            saveVideos(videos);
+            return video;
+        }
+        
+        function updateVideo(id, updates) {
+            const videos = getVideos();
+            const index = videos.findIndex(v => v.id === id);
+            if (index !== -1) {
+                videos[index] = { ...videos[index], ...updates };
+                saveVideos(videos);
+                return videos[index];
+            }
+            return null;
+        }
 
-        // Навигация
+        let currentPage = 'main';
+
         function showMainPage() {
             currentPage = 'main';
             document.getElementById('mainPage').style.display = 'block';
@@ -878,256 +882,289 @@
             });
         }
 
-        // Загрузка видео
-        async function loadVideos(query = '') {
-            try {
-                const response = await fetch(`${API_URL}/api/videos`);
-                let videos = await response.json();
-                
-                if (query) {
-                    const q = query.toLowerCase();
-                    videos = videos.filter(v => 
-                        v.title.toLowerCase().includes(q) || 
-                        v.description.toLowerCase().includes(q) || 
-                        v.author.toLowerCase().includes(q)
-                    );
-                }
-                
-                const container = document.getElementById('videoList');
-                
-                if (videos.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <h3>Нет видео</h3>
-                            <p>${query ? 'Попробуйте другой поиск' : 'Загрузите первое видео!'}</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = videos.map(video => `
-                    <div class="video-card" onclick="openVideo('${video.id}')">
-                        <div class="thumbnail-wrapper">
-                            <img src="${video.thumbnailUrl}" 
-                                 alt="${video.title}" 
-                                 class="thumbnail"
-                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 180%22><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%234A90E2%22/><stop offset=%22100%25%22 stop-color=%22%232E5FA1%22/></linearGradient></defs><rect fill=%22url(%23g)%22 width=%22320%22 height=%22180%22/><text fill=%22white%22 font-size=%2220%22 font-family=%22Arial%22 x=%22160%22 y=%2290%22 text-anchor=%22middle%22>🎬</text></svg>'">
-                            <span class="duration-badge">${video.duration || '0:00'}</span>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${video.title}</div>
-                            <div class="video-meta">
-                                <span>👤 ${video.author}</span>
-                                <div class="video-stats">
-                                    <span class="stat">👁 ${video.views || 0}</span>
-                                    <span class="stat">❤️ ${video.likes || 0}</span>
-                                </div>
+        function loadVideos(query = '') {
+            let videos = getVideos();
+            
+            if (query) {
+                const q = query.toLowerCase();
+                videos = videos.filter(v => 
+                    v.title.toLowerCase().includes(q) || 
+                    v.description.toLowerCase().includes(q) || 
+                    v.author.toLowerCase().includes(q)
+                );
+            }
+            
+            const container = document.getElementById('videoList');
+            
+            if (videos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <h3>Нет видео</h3>
+                        <p>${query ? 'Попробуйте другой поиск' : 'Загрузите первое видео! ⬆️'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = videos.map(video => `
+                <div class="video-card" onclick="openVideo('${video.id}')">
+                    <div class="thumbnail-wrapper">
+                        <img src="${video.thumbnailUrl}" 
+                             alt="${video.title}" 
+                             class="thumbnail"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 180%22><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%234A90E2%22/><stop offset=%22100%25%22 stop-color=%22%232E5FA1%22/></linearGradient></defs><rect fill=%22url(%23g)%22 width=%22320%22 height=%22180%22/><text fill=%22white%22 font-size=%2240%22 font-family=%22Arial%22 x=%22160%22 y=%22100%22 text-anchor=%22middle%22>🎬</text></svg>'">
+                        <span class="duration-badge">${video.duration || '0:00'}</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-meta">
+                            <span>👤 ${video.author}</span>
+                            <div class="video-stats">
+                                <span class="stat">👁 ${video.views || 0}</span>
+                                <span class="stat">❤️ ${video.likes || 0}</span>
                             </div>
                         </div>
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                document.getElementById('videoList').innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">⚠️</div>
-                        <h3>Ошибка загрузки</h3>
-                        <p>Проверьте подключение к серверу</p>
-                    </div>
-                `;
-            }
+                </div>
+            `).join('');
         }
 
-        // Открыть видео
-        async function openVideo(videoId) {
-            try {
-                showVideoPage();
-                const response = await fetch(`${API_URL}/api/videos/${videoId}`);
-                const video = await response.json();
-                currentVideoId = videoId;
+        function openVideo(videoId) {
+            const videos = getVideos();
+            const video = videos.find(v => v.id === videoId);
+            if (!video) return;
+            
+            // Увеличиваем просмотры
+            video.views = (video.views || 0) + 1;
+            updateVideo(videoId, { views: video.views });
+            
+            showVideoPage();
+            
+            document.getElementById('videoContent').innerHTML = `
+                <div class="video-player-container">
+                    <video class="video-player" controls autoplay playsinline>
+                        <source src="${video.videoUrl}" type="video/mp4">
+                        Ваш браузер не поддерживает видео
+                    </video>
+                </div>
                 
-                document.getElementById('videoContent').innerHTML = `
-                    <div class="video-player-container">
-                        <video class="video-player" controls autoplay playsinline>
-                            <source src="${video.videoUrl}" type="video/mp4">
-                        </video>
+                <div class="video-details-card">
+                    <h2>${video.title}</h2>
+                    <div style="color: #5D6D7E; margin-bottom: 10px;">
+                        <strong>${video.author}</strong> • ${video.views} просмотров
+                    </div>
+                    <div style="color: #7F8C8D; font-size: 12px;">
+                        ${new Date(video.uploadDate).toLocaleDateString('ru-RU', { 
+                            day: 'numeric', 
+                            month: 'long', 
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
                     </div>
                     
-                    <div class="video-details-card">
-                        <h2>${video.title}</h2>
-                        <div style="color: #5D6D7E; margin-bottom: 10px;">
-                            <strong>${video.author}</strong> • ${video.views} просмотров
-                        </div>
-                        <div style="color: #7F8C8D; font-size: 12px;">
-                            ${new Date(video.uploadDate).toLocaleDateString('ru-RU', { 
-                                day: 'numeric', 
-                                month: 'long', 
-                                year: 'numeric' 
-                            })}
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="aero-btn like" onclick="likeVideo('${video.id}')">
-                                ❤️ ${video.likes || 0}
-                            </button>
-                            <button class="aero-btn dislike" onclick="dislikeVideo('${video.id}')">
-                                💔 ${video.dislikes || 0}
-                            </button>
-                            <button class="aero-btn share" onclick="shareVideo('${video.id}')">
-                                📤 Поделиться
-                            </button>
-                        </div>
-                        
-                        ${video.description ? `
-                            <div class="description-box">
-                                ${video.description}
-                            </div>
-                        ` : ''}
+                    <div class="action-buttons">
+                        <button class="aero-btn like" onclick="likeVideo('${video.id}')">
+                            ❤️ ${video.likes || 0}
+                        </button>
+                        <button class="aero-btn dislike" onclick="dislikeVideo('${video.id}')">
+                            💔 ${video.dislikes || 0}
+                        </button>
+                        <button class="aero-btn share" onclick="shareVideo()">
+                            📤 Поделиться
+                        </button>
+                        <button class="aero-btn" onclick="deleteVideo('${video.id}')" style="background: linear-gradient(180deg, #95A5A6 0%, #7F8C8D 100%);">
+                            🗑 Удалить
+                        </button>
                     </div>
-                `;
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Не удалось загрузить видео 😔', 'error');
-            }
+                    
+                    ${video.description ? `
+                        <div class="description-box">
+                            ${video.description}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Лайк/дизлайк
-        async function likeVideo(videoId) {
-            try {
-                await fetch(`${API_URL}/api/videos/${videoId}/like`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'like' })
-                });
+        function likeVideo(videoId) {
+            const video = getVideos().find(v => v.id === videoId);
+            if (video) {
+                video.likes = (video.likes || 0) + 1;
+                updateVideo(videoId, { likes: video.likes });
                 openVideo(videoId);
                 showToast('Спасибо! ❤️', 'success');
-            } catch (error) {
-                showToast('Ошибка 😔', 'error');
             }
         }
 
-        async function dislikeVideo(videoId) {
-            try {
-                await fetch(`${API_URL}/api/videos/${videoId}/like`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'dislike' })
-                });
+        function dislikeVideo(videoId) {
+            const video = getVideos().find(v => v.id === videoId);
+            if (video) {
+                video.dislikes = (video.dislikes || 0) + 1;
+                updateVideo(videoId, { dislikes: video.dislikes });
                 openVideo(videoId);
                 showToast('Принято 💔', 'success');
-            } catch (error) {
-                showToast('Ошибка 😔', 'error');
             }
         }
 
-        // Поделиться
-        function shareVideo(videoId) {
-            const url = `${window.location.origin}/?video=${videoId}`;
+        function shareVideo() {
             if (navigator.share) {
                 navigator.share({
                     title: 'Смотри видео на YouTuba!',
-                    url: url
+                    url: window.location.href
                 }).catch(() => {});
             } else {
-                navigator.clipboard.writeText(url).then(() => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
                     showToast('Ссылка скопирована! 📋', 'success');
                 });
             }
         }
 
-        // Поиск
+        function deleteVideo(videoId) {
+            if (confirm('Удалить это видео?')) {
+                const videos = getVideos().filter(v => v.id !== videoId);
+                saveVideos(videos);
+                showToast('Видео удалено 🗑', 'success');
+                showMainPage();
+            }
+        }
+
         function searchVideos() {
             const query = document.getElementById('searchInput').value.trim();
             loadVideos(query);
         }
 
-        // Загрузка видео
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        // Загрузка видео в localStorage
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const formData = new FormData(e.target);
+            const title = document.getElementById('videoTitle').value.trim();
+            const description = document.getElementById('videoDesc').value.trim();
+            const author = document.getElementById('videoAuthor').value.trim() || 'Аноним';
+            const videoFile = document.getElementById('videoFile').files[0];
+            const thumbFile = document.getElementById('thumbFile').files[0];
+            
+            if (!videoFile) {
+                showToast('Выберите видео файл! 📁', 'error');
+                return;
+            }
+            
             const submitBtn = document.getElementById('submitBtn');
             const progressContainer = document.getElementById('progressContainer');
             const progressFill = document.getElementById('progressFill');
             
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Загрузка...';
+            submitBtn.textContent = '⏳ Обработка...';
             progressContainer.style.display = 'block';
-            progressFill.style.width = '0%';
+            progressFill.style.width = '30%';
             
-            try {
-                const xhr = new XMLHttpRequest();
+            const reader = new FileReader();
+            
+            reader.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = 30 + (e.loaded / e.total) * 60;
+                    progressFill.style.width = percent + '%';
+                }
+            };
+            
+            reader.onload = function(e) {
+                progressFill.style.width = '90%';
                 
-                xhr.upload.addEventListener('progress', (e) => {
-                    if (e.lengthComputable) {
-                        const percent = (e.loaded / e.total) * 100;
-                        progressFill.style.width = percent + '%';
-                    }
-                });
+                const videoUrl = e.target.result;
                 
-                const response = await new Promise((resolve, reject) => {
-                    xhr.open('POST', `${API_URL}/api/upload`);
-                    
-                    xhr.onload = () => {
-                        if (xhr.status === 201) {
-                            resolve(JSON.parse(xhr.responseText));
-                        } else {
-                            const error = JSON.parse(xhr.responseText);
-                            reject(new Error(error.error || 'Ошибка загрузки'));
-                        }
+                // Обработка превью
+                if (thumbFile) {
+                    const thumbReader = new FileReader();
+                    thumbReader.onload = function(te) {
+                        saveNewVideo(videoUrl, te.target.result);
                     };
-                    
-                    xhr.onerror = () => reject(new Error('Ошибка сети'));
-                    xhr.send(formData);
-                });
+                    thumbReader.readAsDataURL(thumbFile);
+                } else {
+                    // SVG заглушка
+                    const defaultThumb = 'data:image/svg+xml,' + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">
+                            <defs>
+                                <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#87CEEB"/>
+                                    <stop offset="100%" stop-color="#4A90E2"/>
+                                </linearGradient>
+                            </defs>
+                            <rect width="320" height="180" fill="url(#g)"/>
+                            <circle cx="240" cy="40" r="30" fill="white" opacity="0.3"/>
+                            <text x="160" y="100" text-anchor="middle" fill="white" font-size="50">🎬</text>
+                        </svg>
+                    `);
+                    saveNewVideo(videoUrl, defaultThumb);
+                }
+            };
+            
+            function saveNewVideo(videoUrl, thumbnailUrl) {
+                const newVideo = {
+                    id: Date.now().toString(),
+                    title: title,
+                    description: description,
+                    author: author,
+                    videoUrl: videoUrl,
+                    thumbnailUrl: thumbnailUrl,
+                    views: 0,
+                    likes: 0,
+                    dislikes: 0,
+                    uploadDate: new Date().toISOString(),
+                    duration: '0:00'
+                };
                 
-                showToast('Видео загружено! 🎉', 'success');
-                e.target.reset();
+                addVideo(newVideo);
                 progressFill.style.width = '100%';
                 
-                setTimeout(() => {
-                    showMainPage();
-                    progressContainer.style.display = 'none';
-                }, 1500);
+                showToast('Видео загружено! 🎉', 'success');
                 
-            } catch (error) {
-                showToast(error.message || 'Ошибка 😔', 'error');
-                progressFill.style.width = '0%';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✨ Загрузить видео';
                 setTimeout(() => {
+                    document.getElementById('uploadForm').reset();
+                    document.getElementById('videoFileLabel').textContent = '📁 Выберите видео файл';
+                    document.getElementById('thumbFileLabel').textContent = '🖼 Выберите превью';
                     progressContainer.style.display = 'none';
-                }, 2000);
+                    progressFill.style.width = '0%';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✨ Загрузить видео';
+                    showMainPage();
+                }, 1000);
+            }
+            
+            reader.readAsDataURL(videoFile);
+        });
+
+        // Обновление лейблов файлов
+        document.getElementById('videoFile').addEventListener('change', function(e) {
+            const label = document.getElementById('videoFileLabel');
+            if (this.files[0]) {
+                label.textContent = '📁 ' + this.files[0].name;
+                // Автозаполнение названия
+                if (!document.getElementById('videoTitle').value) {
+                    const name = this.files[0].name.replace(/\.[^/.]+$/, "");
+                    document.getElementById('videoTitle').value = name;
+                }
             }
         });
 
-        // Обновление имени файла в label
-        document.getElementById('videoFile').addEventListener('change', function(e) {
-            const label = this.previousElementSibling;
-            label.textContent = this.files[0] ? `📁 ${this.files[0].name}` : '📁 Выберите видео файл';
-        });
-
         document.getElementById('thumbFile').addEventListener('change', function(e) {
-            const label = this.previousElementSibling;
-            label.textContent = this.files[0] ? `🖼 ${this.files[0].name}` : '🖼 Выберите превью';
+            const label = document.getElementById('thumbFileLabel');
+            if (this.files[0]) {
+                label.textContent = '🖼 ' + this.files[0].name;
+            }
         });
 
-        // Toast сообщения
         function showToast(message, type = 'success') {
             const toast = document.getElementById('messageToast');
             toast.textContent = message;
-            toast.className = `message-toast show ${type}`;
+            toast.className = 'message-toast show ' + type;
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
 
-        // Поиск по Enter
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchVideos();
