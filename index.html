@@ -3,338 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>YouTuba • Frutiger Aero</title>
+    <title>YouTuba</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(180deg, #87CEEB, #4A90E2, #2E5FA1);
-            min-height: 100vh;
-            color: #2C3E50;
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Segoe UI',Arial,sans-serif;
+            background:linear-gradient(180deg,#87CEEB,#4A90E2,#2E5FA1);
+            min-height:100vh;color:#2C3E50;
         }
-        .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
-        .header {
-            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
-            padding: 15px 20px; position: sticky; top: 0; z-index: 100;
-            border-radius: 0 0 20px 20px; display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
+        .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+        .header{
+            background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);padding:15px 20px;
+            position:sticky;top:0;z-index:100;display:flex;
+            align-items:center;justify-content:space-between;
+            border-radius:0 0 20px 20px;
         }
-        .logo { height: 28px; cursor: pointer; }
-        .header-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.4);
-            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        .logo{height:28px;cursor:pointer}
+        .btn{
+            padding:10px 20px;border-radius:25px;border:none;color:white;
+            font-weight:bold;cursor:pointer;font-size:14px;
         }
-        .content { flex: 1; padding: 20px; }
-        .video-list { display: flex; flex-direction: column; gap: 15px; }
-        .video-card {
-            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
-            border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        .btn:active{transform:scale(0.95)}
+        .btn-up{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
+        .btn-refresh{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
+        .content{flex:1;padding:20px}
+        .card{
+            background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);border-radius:20px;padding:15px;
+            margin-bottom:15px;cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,0.2);
+            position:relative;overflow:hidden;
         }
-        .video-card:active { transform: scale(0.98); }
-        .thumb-wrap { width: 100%; padding-top: 56.25%; background: #000; position: relative; }
-        .thumb { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .card-info { padding: 12px 15px; }
-        .card-title { font-size: 16px; font-weight: 600; color: #1a5276; margin-bottom: 5px; }
-        .card-meta { font-size: 13px; color: #5D6D7E; display: flex; justify-content: space-between; }
-        .badge { background: rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 15px; font-size: 12px; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .back-btn {
-            background: rgba(255,255,255,0.45); border-radius: 25px; padding: 10px 20px;
-            color: white; font-weight: 600; cursor: pointer; margin-bottom: 15px; display: inline-block;
+        .card:active{transform:scale(0.98)}
+        .card::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:50%;
+            background:linear-gradient(180deg,rgba(255,255,255,0.3),transparent);
+            pointer-events:none;border-radius:20px 20px 0 0;
         }
-        .player-wrap { background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 15px; }
-        .player { width: 100%; display: block; aspect-ratio: 16/9; }
-        .details-card {
-            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
-            border-radius: 20px; padding: 20px;
+        .card h3{color:#1a5276;margin-bottom:5px;position:relative;z-index:1}
+        .card p{color:#5D6D7E;font-size:13px;position:relative;z-index:1}
+        .page{display:none}
+        .page.active{display:block}
+        .back{
+            background:rgba(255,255,255,0.45);padding:10px 20px;
+            border-radius:25px;cursor:pointer;margin-bottom:15px;
+            display:inline-block;font-weight:bold;color:white;
         }
-        .details-card h2 { font-size: 20px; color: #1a5276; margin-bottom: 10px; }
-        .actions { display: flex; gap: 10px; margin: 15px 0; }
-        .btn {
-            padding: 10px 20px; border-radius: 25px; color: white; font-weight: 600;
-            cursor: pointer; border: none; font-size: 14px;
+        video{
+            width:100%;border-radius:20px;margin-bottom:15px;
+            background:#000;box-shadow:0 8px 32px rgba(0,0,0,0.3);
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-like { background: linear-gradient(180deg, #7DCEA0, #27AE60); }
-        .btn-share { background: linear-gradient(180deg, #5DADE2, #2E86C1); }
-        .upload-form {
-            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
-            border-radius: 20px; padding: 20px;
+        .details{
+            background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);border-radius:20px;padding:20px;
         }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a5276; }
-        .input {
-            width: 100%; padding: 12px 15px; border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.3);
-            font-size: 16px; outline: none; color: #2C3E50;
+        .details h2{color:#1a5276;margin-bottom:10px}
+        .actions{margin-top:15px;display:flex;gap:10px;flex-wrap:wrap}
+        .btn-like{background:linear-gradient(180deg,#7DCEA0,#27AE60)}
+        .btn-share{background:linear-gradient(180deg,#5DADE2,#2E86C1)}
+        .badge{
+            background:rgba(255,255,255,0.3);padding:4px 10px;
+            border-radius:15px;font-size:12px;display:inline-block;margin-right:5px;
         }
-        .file-label {
-            display: flex; padding: 15px; background: rgba(255,255,255,0.45);
-            border: 2px dashed rgba(255,255,255,0.4); border-radius: 15px; cursor: pointer; word-break: break-all;
+        .toast{
+            position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+            background:#27AE60;color:white;padding:15px 25px;
+            border-radius:25px;font-weight:bold;z-index:1000;display:none;
         }
-        .file-input { display: none; }
-        .submit-btn {
-            width: 100%; padding: 15px; background: linear-gradient(180deg, #7DCEA0, #27AE60);
-            border: none; border-radius: 25px; color: white; font-size: 18px;
-            font-weight: 700; cursor: pointer; margin-top: 20px;
+        .toast.show{display:block;animation:up 0.5s}
+        @keyframes up{
+            from{transform:translateX(-50%) translateY(100px);opacity:0}
+            to{transform:translateX(-50%) translateY(0);opacity:1}
         }
-        .submit-btn:disabled { opacity: 0.5; }
-        .progress {
-            margin-top: 20px; background: rgba(255,255,255,0.3);
-            border-radius: 15px; height: 8px; overflow: hidden; display: none;
+        .empty{text-align:center;padding:60px 20px;color:#5D6D7E}
+        .empty-icon{font-size:60px;margin-bottom:15px}
+        .input{
+            width:100%;padding:12px 15px;border-radius:15px;
+            border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.3);
+            margin-bottom:10px;font-size:16px;outline:none;color:#2C3E50;
         }
-        .progress-fill {
-            height: 100%; background: linear-gradient(180deg, #7DCEA0, #27AE60);
-            width: 0%; transition: width 0.3s;
+        .file-label{
+            display:block;padding:15px;background:rgba(255,255,255,0.45);
+            border:2px dashed rgba(255,255,255,0.4);border-radius:15px;
+            cursor:pointer;margin-bottom:15px;text-align:center;word-break:break-all;
         }
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #27AE60; border-radius: 25px; padding: 15px 25px;
-            color: white; font-weight: 600; z-index: 1000; display: none;
+        .file-inp{display:none}
+        .green-btn{
+            width:100%;padding:15px;background:linear-gradient(180deg,#7DCEA0,#27AE60);
+            border:none;border-radius:25px;color:white;font-size:18px;
+            font-weight:bold;cursor:pointer;margin-top:10px;
         }
-        .toast.show { display: block; }
-        .toast.error { background: #E74C3C; }
-        .empty { text-align: center; padding: 60px 20px; }
-        .empty-icon { font-size: 60px; margin-bottom: 15px; }
-        .bottom-nav {
-            position: sticky; bottom: 0; background: rgba(255,255,255,0.45);
-            backdrop-filter: blur(20px); padding: 10px 20px; display: flex;
-            justify-content: space-around; border-radius: 20px 20px 0 0; margin-top: auto;
+        .green-btn:disabled{opacity:0.5}
+        .progress{
+            margin:15px 0;background:rgba(255,255,255,0.3);
+            border-radius:15px;height:8px;overflow:hidden;display:none;
         }
-        .nav-btn {
-            display: flex; flex-direction: column; align-items: center; background: none;
-            border: none; color: white; cursor: pointer; font-size: 12px; font-weight: 600;
+        .progress-fill{
+            height:100%;background:#27AE60;border-radius:15px;
+            width:0%;transition:width 0.3s;
         }
-        .nav-btn.active { background: rgba(255,255,255,0.3); border-radius: 20px; padding: 8px 15px; }
-        .nav-icon { font-size: 22px; }
+        .nav{
+            position:sticky;bottom:0;background:rgba(255,255,255,0.45);
+            backdrop-filter:blur(20px);padding:15px;display:flex;
+            justify-content:space-around;border-radius:20px 20px 0 0;
+        }
+        .nav-btn{
+            background:none;border:none;color:white;font-weight:bold;
+            cursor:pointer;font-size:14px;padding:10px 20px;border-radius:20px;
+        }
+        .nav-btn.active{background:rgba(255,255,255,0.3)}
     </style>
 </head>
 <body>
     <div class="app">
         <div class="header">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" class="logo" onclick="show('main')">
-            <button class="header-btn" onclick="show('upload')">⬆️</button>
+            <button class="btn btn-up" onclick="show('upload')">⬆️ Загрузить</button>
         </div>
 
         <div class="content page active" id="main">
-            <div class="video-list" id="list">
-                <div class="empty"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>
-            </div>
+            <button class="btn btn-refresh" onclick="loadVideos()" style="margin-bottom:15px;">🔄 Обновить</button>
+            <div id="list"></div>
         </div>
 
         <div class="content page" id="video">
-            <button class="back-btn" onclick="show('main')">⬅️ Назад</button>
-            <div id="videoContent"></div>
+            <span class="back" onclick="show('main')">⬅️ Назад</span>
+            <div id="player"></div>
         </div>
 
         <div class="content page" id="upload">
-            <button class="back-btn" onclick="show('main')">⬅️ Назад</button>
-            <form class="upload-form" id="form">
-                <div class="form-group">
-                    <label>📝 Название</label>
-                    <input type="text" class="input" id="title" required placeholder="Название видео">
-                </div>
-                <div class="form-group">
-                    <label>👤 Автор</label>
-                    <input type="text" class="input" id="author" value="Аноним">
-                </div>
-                <div class="form-group">
-                    <label>🎥 Видео</label>
-                    <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео</label>
-                    <input type="file" class="file-input" id="file" accept="video/*" required>
-                </div>
-                <div class="progress" id="bar"><div class="progress-fill" id="fill"></div></div>
-                <button type="submit" class="submit-btn" id="submitBtn">✨ Загрузить</button>
-            </form>
+            <span class="back" onclick="show('main')">⬅️ Назад</span>
+            <input type="text" class="input" id="title" placeholder="📝 Название видео">
+            <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео</label>
+            <input type="file" class="file-inp" id="file" accept="video/*">
+            <div class="progress" id="bar"><div class="progress-fill" id="fill"></div></div>
+            <button class="green-btn" id="submitBtn" onclick="upload()">✨ Загрузить на Диск</button>
         </div>
 
-        <div class="bottom-nav">
-            <button class="nav-btn active" data-p="main" onclick="show('main')">
-                <span class="nav-icon">🏠</span> Главная
-            </button>
-            <button class="nav-btn" data-p="upload" onclick="show('upload')">
-                <span class="nav-icon">⬆️</span> Загрузить
-            </button>
+        <div class="nav">
+            <button class="nav-btn active" data-p="main" onclick="show('main')">🏠 Главная</button>
+            <button class="nav-btn" data-p="upload" onclick="show('upload')">⬆️ Загрузить</button>
         </div>
     </div>
     <div class="toast" id="toast"></div>
 
     <script>
-        // Хранилище на GitHub Gist (бесплатно, без токена)
-        const GIST_ID = localStorage.getItem('gist_id');
-        
-        async function getGist() {
-            if (GIST_ID) {
-                try {
-                    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`);
-                    if (r.ok) {
-                        const g = await r.json();
-                        return JSON.parse(g.files['youtuba.json'].content);
-                    }
-                } catch(e) {}
-            }
-            return [];
-        }
-        
-        async function createGist(videos) {
-            const r = await fetch('https://api.github.com/gists', {
-                method: 'POST',
-                body: JSON.stringify({
-                    public: true,
-                    files: {
-                        'youtuba.json': {
-                            content: JSON.stringify(videos)
-                        }
-                    }
-                })
-            });
-            const g = await r.json();
-            localStorage.setItem('gist_id', g.id);
-            return g.id;
-        }
-        
-        async function updateGist(videos) {
-            let id = GIST_ID;
-            if (!id) id = await createGist(videos);
-            
-            await fetch(`https://api.github.com/gists/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify({
-                    files: {
-                        'youtuba.json': {
-                            content: JSON.stringify(videos)
-                        }
-                    }
-                })
-            });
-        }
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyneIOIM5F9MAfE1ddf7inB-w4P8WO_5kW7n--JRDQKjFqcO31f9SG_kia2tQSmT0OK/exec';
 
         async function loadVideos() {
-            const videos = await getGist();
-            const c = document.getElementById('list');
-            
-            if (!videos.length) {
-                c.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео</p></div>';
-                return;
+            const list = document.getElementById('list');
+            list.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><p>Сканирую Google Диск...</p></div>';
+
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const videos = await res.json();
+                
+                if (videos.error) {
+                    list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><p>${videos.error}</p></div>`;
+                    return;
+                }
+                
+                if (!videos.length) {
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео на Диске</p><p style="font-size:13px;">Загрузите через кнопку "Загрузить"</p></div>';
+                    return;
+                }
+                
+                list.innerHTML = videos.map(v => `
+                    <div class="card" onclick="openVideo('${v.id}')">
+                        <h3>🎬 ${v.name}</h3>
+                        <p><span class="badge">👁 ${v.views||0}</span> <span class="badge">❤️ ${v.likes||0}</span></p>
+                    </div>
+                `).join('');
+            } catch(e) {
+                list.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><p>Ошибка загрузки</p></div>';
             }
-            
-            c.innerHTML = videos.map(v => `
-                <div class="video-card" onclick="openVideo('${v.id}')">
-                    <div class="thumb-wrap">
-                        <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" class="thumb">
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title">${v.title}</div>
-                        <div class="card-meta">
-                            <span>👤 ${v.author}</span>
-                            <span class="badge">❤️ ${v.likes||0} • 👁 ${v.views||0}</span>
+        }
+
+        function openVideo(id) {
+            fetch(`${SCRIPT_URL}?id=${id}`)
+                .then(r => r.json())
+                .then(v => {
+                    show('video');
+                    document.getElementById('player').innerHTML = `
+                        <video controls autoplay playsinline>
+                            <source src="https://drive.google.com/uc?export=download&id=${v.driveId}" type="video/mp4">
+                        </video>
+                        <div class="details">
+                            <h2>${v.name}</h2>
+                            <p style="color:#5D6D7E;">👁 ${v.views} просмотров</p>
+                            <div class="actions">
+                                <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes}</button>
+                                <button class="btn btn-share" onclick="share()">📤 Поделиться</button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                    window.scrollTo(0,0);
+                });
         }
 
-        async function openVideo(id) {
-            const videos = await getGist();
-            const v = videos.find(x => x.id === id);
-            if (!v) return;
-            
-            v.views = (v.views||0) + 1;
-            await updateGist(videos);
-            
-            show('video');
-            document.getElementById('videoContent').innerHTML = `
-                <div class="player-wrap">
-                    <video class="player" controls autoplay playsinline>
-                        <source src="${v.videoUrl}" type="video/mp4">
-                    </video>
-                </div>
-                <div class="details-card">
-                    <h2>${v.title}</h2>
-                    <p style="color:#5D6D7E;margin-bottom:10px;"><strong>${v.author}</strong> • ${v.views} просмотров</p>
-                    <div class="actions">
-                        <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes||0}</button>
-                        <button class="btn btn-share" onclick="share()">📤 Поделиться</button>
-                    </div>
-                </div>
-            `;
-            window.scrollTo(0,0);
-        }
-
-        async function like(id) {
-            const videos = await getGist();
-            const v = videos.find(x => x.id === id);
-            if (v) { v.likes = (v.likes||0) + 1; await updateGist(videos); openVideo(id); }
+        function like(id) {
+            fetch(`${SCRIPT_URL}?action=like&id=${id}`).then(() => openVideo(id));
         }
 
         function share() {
             navigator.clipboard.writeText(window.location.href);
-            toast('📋 Скопировано!');
+            toast('📋 Ссылка скопирована!');
         }
 
-        document.getElementById('form').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        function upload() {
             const file = document.getElementById('file').files[0];
-            if (!file) return;
-            
+            if (!file) { toast('⚠️ Выберите файл!'); return; }
+
             const btn = document.getElementById('submitBtn');
             const bar = document.getElementById('bar');
             const fill = document.getElementById('fill');
             
-            btn.disabled = true; btn.textContent = '⏳';
+            btn.disabled = true; btn.textContent = '⏳ Загрузка...';
             bar.style.display = 'block'; fill.style.width = '0%';
-            
-            const reader = new FileReader();
-            reader.onprogress = e => { if (e.lengthComputable) fill.style.width = (e.loaded/e.total*100) + '%'; };
-            reader.onload = async function(e) {
-                const videos = await getGist();
-                videos.unshift({
-                    id: Date.now().toString(),
-                    title: document.getElementById('title').value.trim(),
-                    author: document.getElementById('author').value.trim()||'Аноним',
-                    videoUrl: e.target.result,
-                    likes: 0, views: 0,
-                    date: new Date().toISOString()
-                });
-                
-                await updateGist(videos);
-                
-                fill.style.width = '100%';
-                toast('✅ Загружено!');
-                
-                setTimeout(() => {
-                    document.getElementById('form').reset();
-                    document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
-                    bar.style.display = 'none'; fill.style.width = '0%';
-                    btn.disabled = false; btn.textContent = '✨ Загрузить';
-                    show('main');
-                }, 500);
-            };
-            reader.readAsDataURL(file);
-        });
 
-        function show(p) {
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-            document.getElementById(p).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-p="${p}"]`)?.classList.add('active');
-            if (p === 'main') loadVideos();
+            const reader = new FileReader();
+            reader.onprogress = e => {
+                if (e.lengthComputable) fill.style.width = (e.loaded/e.total*50) + '%';
+            };
+            
+            reader.onload = async function(e) {
+                fill.style.width = '50%';
+                
+                try {
+                    const base64 = e.target.result.split(',')[1];
+                    const res = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'upload',
+                            name: document.getElementById('title').value || file.name,
+                            file: base64,
+                            mimeType: file.type
+                        })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        fill.style.width = '100%';
+                        toast('✅ Загружено на Google Диск!');
+                        setTimeout(() => {
+                            document.getElementById('file').value = '';
+                            document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
+                            document.getElementById('title').value = '';
+                            bar.style.display = 'none';
+                            btn.disabled = false; btn.textContent = '✨ Загрузить на Диск';
+                            show('main');
+                        }, 1000);
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch(err) {
+                    toast('❌ ' + err.message);
+                    btn.disabled = false; btn.textContent = '✨ Загрузить на Диск';
+                    bar.style.display = 'none';
+                }
+            };
+            
+            reader.readAsDataURL(file);
         }
 
-        function toast(m, t='') {
-            const el = document.getElementById('toast');
-            el.textContent = m; el.className = 'toast show ' + t;
-            setTimeout(() => el.classList.remove('show'), 2000);
+        function show(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-p="${page}"]`)?.classList.add('active');
+            if (page === 'main') loadVideos();
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
         }
 
         document.getElementById('file').addEventListener('change', function() {
             if (this.files[0]) {
                 document.getElementById('fileLabel').textContent = '📁 ' + this.files[0].name;
-                if (!document.getElementById('title').value) {
-                    document.getElementById('title').value = this.files[0].name.replace(/\.[^/.]+$/, "");
-                }
             }
         });
 
