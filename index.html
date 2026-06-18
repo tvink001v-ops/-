@@ -5,731 +5,335 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>YouTuba • Frutiger Aero</title>
     <style>
-        :root {
-            --aero-sky: linear-gradient(180deg, #87CEEB 0%, #4A90E2 50%, #2E5FA1 100%);
-            --aero-glass: rgba(255,255,255,0.45);
-            --aero-green: linear-gradient(180deg, #7DCEA0 0%, #27AE60 100%);
-            --aero-blue: linear-gradient(180deg, #5DADE2 0%, #2E86C1 100%);
-            --aero-red: linear-gradient(180deg, #F1948A 0%, #E74C3C 100%);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: var(--aero-sky);
-            background-attachment: fixed;
+            background: linear-gradient(180deg, #87CEEB, #4A90E2, #2E5FA1);
             min-height: 100vh;
             color: #2C3E50;
-            -webkit-font-smoothing: antialiased;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .sun-flare {
-            position: fixed;
-            top: -50px; right: -50px;
-            width: 150px; height: 150px;
-            background: radial-gradient(circle, rgba(255,255,200,0.6) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .app {
-            position: relative;
-            z-index: 1;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
         .header {
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-radius: 0 0 20px 20px;
+            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
+            padding: 15px 20px; position: sticky; top: 0; z-index: 100;
+            border-radius: 0 0 20px 20px; display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
-
-        .logo {
-            height: 28px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            cursor: pointer;
-        }
-
+        .logo { height: 28px; cursor: pointer; }
         .header-btn {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: var(--aero-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.4);
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.4);
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-
-        .header-btn:active { transform: scale(0.9); }
-
-        .content { flex: 1; padding: 0 20px 20px; }
-
+        .content { flex: 1; padding: 20px; }
         .video-list { display: flex; flex-direction: column; gap: 15px; }
-
         .video-card {
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            cursor: pointer;
-            position: relative;
+            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
+            border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
-
         .video-card:active { transform: scale(0.98); }
-
-        .video-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
-            pointer-events: none;
-            z-index: 2;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .thumb-wrap {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%;
-            background: #000;
-        }
-
-        .thumb {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover;
-        }
-
-        .card-info {
-            padding: 12px 15px;
-            position: relative;
-            z-index: 3;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a5276;
-            margin-bottom: 5px;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-        }
-
-        .card-meta {
-            font-size: 13px;
-            color: #5D6D7E;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .badge {
-            background: rgba(255,255,255,0.3);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
+        .thumb-wrap { width: 100%; padding-top: 56.25%; background: #000; position: relative; }
+        .thumb { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .card-info { padding: 12px 15px; }
+        .card-title { font-size: 16px; font-weight: 600; color: #1a5276; margin-bottom: 5px; }
+        .card-meta { font-size: 13px; color: #5D6D7E; display: flex; justify-content: space-between; }
+        .badge { background: rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 15px; font-size: 12px; }
         .page { display: none; }
         .page.active { display: block; }
-
         .back-btn {
-            background: var(--aero-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 25px;
-            padding: 10px 20px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: rgba(255,255,255,0.45); border-radius: 25px; padding: 10px 20px;
+            color: white; font-weight: 600; cursor: pointer; margin-bottom: 15px; display: inline-block;
         }
-
-        .back-btn:active { transform: scale(0.95); }
-
-        .player-wrap {
-            background: #000;
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .player {
-            width: 100%;
-            display: block;
-            aspect-ratio: 16/9;
-        }
-
+        .player-wrap { background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 15px; }
+        .player { width: 100%; display: block; aspect-ratio: 16/9; }
         .details-card {
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 20px;
         }
-
-        .details-card h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a5276;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
+        .details-card h2 { font-size: 20px; color: #1a5276; margin-bottom: 10px; }
+        .actions { display: flex; gap: 10px; margin: 15px 0; }
         .btn {
-            background: var(--aero-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 25px;
-            padding: 10px 20px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            font-size: 14px;
+            padding: 10px 20px; border-radius: 25px; color: white; font-weight: 600;
+            cursor: pointer; border: none; font-size: 14px;
         }
-
         .btn:active { transform: scale(0.95); }
-        .btn-like { background: var(--aero-green); }
-        .btn-share { background: var(--aero-blue); }
-
+        .btn-like { background: linear-gradient(180deg, #7DCEA0, #27AE60); }
+        .btn-share { background: linear-gradient(180deg, #5DADE2, #2E86C1); }
         .upload-form {
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.45); backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 20px;
         }
-
         .form-group { margin-bottom: 20px; }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1a5276;
-            font-size: 14px;
-        }
-
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a5276; }
         .input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.4);
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-size: 16px;
-            color: #2C3E50;
-            outline: none;
+            width: 100%; padding: 12px 15px; border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.3);
+            font-size: 16px; outline: none; color: #2C3E50;
         }
-
-        .input:focus {
-            border-color: #4A90E2;
-            box-shadow: 0 0 20px rgba(74,144,226,0.2);
-        }
-
         .file-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px;
-            background: var(--aero-glass);
-            border: 2px dashed rgba(255,255,255,0.4);
-            border-radius: 15px;
-            cursor: pointer;
-            text-align: center;
-            color: #5D6D7E;
-            word-break: break-all;
+            display: flex; padding: 15px; background: rgba(255,255,255,0.45);
+            border: 2px dashed rgba(255,255,255,0.4); border-radius: 15px; cursor: pointer; word-break: break-all;
         }
-
-        .file-label:active { background: rgba(255,255,255,0.6); }
         .file-input { display: none; }
-
         .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--aero-green);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(39,174,96,0.4);
-            margin-top: 20px;
+            width: 100%; padding: 15px; background: linear-gradient(180deg, #7DCEA0, #27AE60);
+            border: none; border-radius: 25px; color: white; font-size: 18px;
+            font-weight: 700; cursor: pointer; margin-top: 20px;
         }
-
         .submit-btn:disabled { opacity: 0.5; }
-        .submit-btn:active { transform: scale(0.95); }
-
         .progress {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 15px;
-            height: 8px;
-            overflow: hidden;
-            display: none;
+            margin-top: 20px; background: rgba(255,255,255,0.3);
+            border-radius: 15px; height: 8px; overflow: hidden; display: none;
         }
-
         .progress-fill {
-            height: 100%;
-            background: var(--aero-green);
-            border-radius: 15px;
-            width: 0%;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(39,174,96,0.5);
+            height: 100%; background: linear-gradient(180deg, #7DCEA0, #27AE60);
+            width: 0%; transition: width 0.3s;
         }
-
         .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 25px;
-            padding: 15px 25px;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none;
-            text-align: center;
-            max-width: 90%;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #27AE60; border-radius: 25px; padding: 15px 25px;
+            color: white; font-weight: 600; z-index: 1000; display: none;
         }
-
-        .toast.show { display: block; animation: slideUp 0.5s ease; }
-        .toast.success { background: var(--aero-green); }
-        .toast.error { background: var(--aero-red); }
-
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
+        .toast.show { display: block; }
+        .toast.error { background: #E74C3C; }
+        .empty { text-align: center; padding: 60px 20px; }
         .empty-icon { font-size: 60px; margin-bottom: 15px; }
-        .empty h3 { font-size: 18px; color: #5D6D7E; margin-bottom: 10px; }
-        .empty p { color: #7F8C8D; font-size: 14px; }
-
         .bottom-nav {
-            position: sticky;
-            bottom: 0;
-            background: var(--aero-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.4);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-around;
-            z-index: 100;
-            border-radius: 20px 20px 0 0;
-            margin-top: auto;
+            position: sticky; bottom: 0; background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(20px); padding: 10px 20px; display: flex;
+            justify-content: space-around; border-radius: 20px 20px 0 0; margin-top: auto;
         }
-
         .nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            display: flex; flex-direction: column; align-items: center; background: none;
+            border: none; color: white; cursor: pointer; font-size: 12px; font-weight: 600;
         }
-
-        .nav-btn.active { background: var(--aero-glass); }
+        .nav-btn.active { background: rgba(255,255,255,0.3); border-radius: 20px; padding: 8px 15px; }
         .nav-icon { font-size: 22px; }
-
-        @media (max-width: 320px) {
-            .card-title { font-size: 14px; }
-            .btn { padding: 8px 15px; font-size: 12px; }
-        }
     </style>
 </head>
 <body>
-    <div class="sun-flare"></div>
-
     <div class="app">
         <div class="header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" alt="YouTuba" class="logo" onclick="showPage('main')">
-            <button class="header-btn" onclick="showPage('upload')">⬆️</button>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" class="logo" onclick="show('main')">
+            <button class="header-btn" onclick="show('upload')">⬆️</button>
         </div>
 
-        <div class="content page active" id="page-main">
-            <div class="video-list" id="videoList">
-                <div class="empty">
-                    <div class="empty-icon">⏳</div>
-                    <h3>Загрузка видео...</h3>
-                </div>
+        <div class="content page active" id="main">
+            <div class="video-list" id="list">
+                <div class="empty"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>
             </div>
         </div>
 
-        <div class="content page" id="page-video">
-            <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
+        <div class="content page" id="video">
+            <button class="back-btn" onclick="show('main')">⬅️ Назад</button>
             <div id="videoContent"></div>
         </div>
 
-        <div class="content page" id="page-upload">
-            <button class="back-btn" onclick="showPage('main')">⬅️ Назад</button>
-            <form class="upload-form" id="uploadForm">
+        <div class="content page" id="upload">
+            <button class="back-btn" onclick="show('main')">⬅️ Назад</button>
+            <form class="upload-form" id="form">
                 <div class="form-group">
-                    <label>📝 Название видео</label>
-                    <input type="text" class="input" id="titleInput" required placeholder="Крутое видео">
+                    <label>📝 Название</label>
+                    <input type="text" class="input" id="title" required placeholder="Название видео">
                 </div>
                 <div class="form-group">
                     <label>👤 Автор</label>
-                    <input type="text" class="input" id="authorInput" placeholder="Ваше имя" value="Аноним">
+                    <input type="text" class="input" id="author" value="Аноним">
                 </div>
                 <div class="form-group">
-                    <label>🎥 Видео файл</label>
-                    <label class="file-label" for="videoInput" id="videoLabel">📁 Выбрать видео</label>
-                    <input type="file" class="file-input" id="videoInput" accept="video/*" required>
+                    <label>🎥 Видео</label>
+                    <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео</label>
+                    <input type="file" class="file-input" id="file" accept="video/*" required>
                 </div>
-                <div class="progress" id="progressBar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <button type="submit" class="submit-btn" id="submitBtn">✨ Загрузить видео</button>
+                <div class="progress" id="bar"><div class="progress-fill" id="fill"></div></div>
+                <button type="submit" class="submit-btn" id="submitBtn">✨ Загрузить</button>
             </form>
         </div>
 
         <div class="bottom-nav">
-            <button class="nav-btn active" data-page="main" onclick="showPage('main')">
+            <button class="nav-btn active" data-p="main" onclick="show('main')">
                 <span class="nav-icon">🏠</span> Главная
             </button>
-            <button class="nav-btn" data-page="upload" onclick="showPage('upload')">
+            <button class="nav-btn" data-p="upload" onclick="show('upload')">
                 <span class="nav-icon">⬆️</span> Загрузить
             </button>
         </div>
     </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
-        const TOKEN = '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';
-        const USER = 'tvink001v-ops';
-        const REPO = '-';
+        // Хранилище на GitHub Gist (бесплатно, без токена)
+        const GIST_ID = localStorage.getItem('gist_id');
+        
+        async function getGist() {
+            if (GIST_ID) {
+                try {
+                    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`);
+                    if (r.ok) {
+                        const g = await r.json();
+                        return JSON.parse(g.files['youtuba.json'].content);
+                    }
+                } catch(e) {}
+            }
+            return [];
+        }
+        
+        async function createGist(videos) {
+            const r = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                body: JSON.stringify({
+                    public: true,
+                    files: {
+                        'youtuba.json': {
+                            content: JSON.stringify(videos)
+                        }
+                    }
+                })
+            });
+            const g = await r.json();
+            localStorage.setItem('gist_id', g.id);
+            return g.id;
+        }
+        
+        async function updateGist(videos) {
+            let id = GIST_ID;
+            if (!id) id = await createGist(videos);
+            
+            await fetch(`https://api.github.com/gists/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    files: {
+                        'youtuba.json': {
+                            content: JSON.stringify(videos)
+                        }
+                    }
+                })
+            });
+        }
 
-        async function loadVideos(query = '') {
-            const container = document.getElementById('videoList');
-            container.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><h3>Загрузка...</h3></div>';
-
-            try {
-                const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos`, {
-                    headers: { 'Authorization': `token ${TOKEN}` }
-                });
-
-                if (!res.ok) {
-                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
-                    return;
-                }
-
-                const files = await res.json();
-                const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-
-                if (!jsonFiles.length) {
-                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Нет видео</h3><p>Загрузите первое!</p></div>';
-                    return;
-                }
-
-                const videos = [];
-                for (const f of jsonFiles) {
-                    try {
-                        const r = await fetch(f.download_url);
-                        videos.push(await r.json());
-                    } catch(e) {}
-                }
-
-                videos.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                let filtered = query ? videos.filter(v =>
-                    v.title.toLowerCase().includes(query.toLowerCase()) ||
-                    v.author.toLowerCase().includes(query.toLowerCase())
-                ) : videos;
-
-                if (!filtered.length) {
-                    container.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><h3>Ничего не найдено</h3></div>';
-                    return;
-                }
-
-                container.innerHTML = filtered.map(v => `
-                    <div class="video-card" onclick="openVideo('${v.id}')">
-                        <div class="thumb-wrap">
-                            <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><circle cx="240" cy="40" r="30" fill="white" opacity="0.3"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" class="thumb">
-                        </div>
-                        <div class="card-info">
-                            <div class="card-title">${v.title}</div>
-                            <div class="card-meta">
-                                <span>👤 ${v.author}</span>
-                                <span class="badge">👁 ${v.views||0} • ❤️ ${v.likes||0}</span>
-                            </div>
+        async function loadVideos() {
+            const videos = await getGist();
+            const c = document.getElementById('list');
+            
+            if (!videos.length) {
+                c.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео</p></div>';
+                return;
+            }
+            
+            c.innerHTML = videos.map(v => `
+                <div class="video-card" onclick="openVideo('${v.id}')">
+                    <div class="thumb-wrap">
+                        <img src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#4A90E2"/></linearGradient></defs><rect fill="url(#g)" width="320" height="180"/><text fill="white" font-size="50" x="160" y="100" text-anchor="middle">🎬</text></svg>')}" class="thumb">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${v.title}</div>
+                        <div class="card-meta">
+                            <span>👤 ${v.author}</span>
+                            <span class="badge">❤️ ${v.likes||0} • 👁 ${v.views||0}</span>
                         </div>
                     </div>
-                `).join('');
-
-            } catch(e) {
-                console.error(e);
-                container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Ошибка</h3><p>Проверьте консоль</p></div>';
-            }
+                </div>
+            `).join('');
         }
 
         async function openVideo(id) {
-            try {
-                const res = await fetch(`https://raw.githubusercontent.com/${USER}/${REPO}/main/videos/${id}.json`);
-                const v = await res.json();
-
-                showPage('video');
-
-                document.getElementById('videoContent').innerHTML = `
-                    <div class="player-wrap">
-                        <video class="player" controls autoplay playsinline>
-                            <source src="${v.videoUrl}" type="video/mp4">
-                        </video>
+            const videos = await getGist();
+            const v = videos.find(x => x.id === id);
+            if (!v) return;
+            
+            v.views = (v.views||0) + 1;
+            await updateGist(videos);
+            
+            show('video');
+            document.getElementById('videoContent').innerHTML = `
+                <div class="player-wrap">
+                    <video class="player" controls autoplay playsinline>
+                        <source src="${v.videoUrl}" type="video/mp4">
+                    </video>
+                </div>
+                <div class="details-card">
+                    <h2>${v.title}</h2>
+                    <p style="color:#5D6D7E;margin-bottom:10px;"><strong>${v.author}</strong> • ${v.views} просмотров</p>
+                    <div class="actions">
+                        <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes||0}</button>
+                        <button class="btn btn-share" onclick="share()">📤 Поделиться</button>
                     </div>
-                    <div class="details-card">
-                        <h2>${v.title}</h2>
-                        <div style="color:#5D6D7E;margin-bottom:10px;">
-                            <strong>${v.author}</strong> • ${v.views||0} просмотров
-                        </div>
-                        <div style="color:#7F8C8D;font-size:12px;">
-                            ${new Date(v.date).toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'})}
-                        </div>
-                        <div class="actions">
-                            <button class="btn btn-like" onclick="likeVideo('${v.id}')">❤️ ${v.likes||0}</button>
-                            <button class="btn btn-share" onclick="shareVideo()">📤 Поделиться</button>
-                        </div>
-                    </div>
-                `;
-
-                window.scrollTo(0, 0);
-            } catch(e) {
-                toast('Ошибка загрузки видео', 'error');
-            }
+                </div>
+            `;
+            window.scrollTo(0,0);
         }
 
-        async function likeVideo(id) {
-            try {
-                const res = await fetch(`https://raw.githubusercontent.com/${USER}/${REPO}/main/videos/${id}.json`);
-                const v = await res.json();
-                v.likes = (v.likes||0) + 1;
-                
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(v))));
-                
-                await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `❤️ Лайк: ${v.title}`,
-                        content: content,
-                        sha: await getFileSha(id)
-                    })
+        async function like(id) {
+            const videos = await getGist();
+            const v = videos.find(x => x.id === id);
+            if (v) { v.likes = (v.likes||0) + 1; await updateGist(videos); openVideo(id); }
+        }
+
+        function share() {
+            navigator.clipboard.writeText(window.location.href);
+            toast('📋 Скопировано!');
+        }
+
+        document.getElementById('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const file = document.getElementById('file').files[0];
+            if (!file) return;
+            
+            const btn = document.getElementById('submitBtn');
+            const bar = document.getElementById('bar');
+            const fill = document.getElementById('fill');
+            
+            btn.disabled = true; btn.textContent = '⏳';
+            bar.style.display = 'block'; fill.style.width = '0%';
+            
+            const reader = new FileReader();
+            reader.onprogress = e => { if (e.lengthComputable) fill.style.width = (e.loaded/e.total*100) + '%'; };
+            reader.onload = async function(e) {
+                const videos = await getGist();
+                videos.unshift({
+                    id: Date.now().toString(),
+                    title: document.getElementById('title').value.trim(),
+                    author: document.getElementById('author').value.trim()||'Аноним',
+                    videoUrl: e.target.result,
+                    likes: 0, views: 0,
+                    date: new Date().toISOString()
                 });
                 
-                openVideo(id);
-                toast('❤️ Спасибо!');
-            } catch(e) {
-                toast('Ошибка', 'error');
-            }
-        }
-
-        async function getFileSha(id) {
-            const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
-                headers: { 'Authorization': `token ${TOKEN}` }
-            });
-            const data = await res.json();
-            return data.sha;
-        }
-
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({ url: window.location.href }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                toast('📋 Ссылка скопирована!');
-            }
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const file = document.getElementById('videoInput').files[0];
-            if (!file) return;
-
-            const submitBtn = document.getElementById('submitBtn');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Чтение файла...';
-            progressBar.style.display = 'block';
-            progressFill.style.width = '10%';
-
-            const reader = new FileReader();
-
-            reader.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    progressFill.style.width = (10 + (e.loaded/e.total)*30) + '%';
-                }
+                await updateGist(videos);
+                
+                fill.style.width = '100%';
+                toast('✅ Загружено!');
+                
+                setTimeout(() => {
+                    document.getElementById('form').reset();
+                    document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
+                    bar.style.display = 'none'; fill.style.width = '0%';
+                    btn.disabled = false; btn.textContent = '✨ Загрузить';
+                    show('main');
+                }, 500);
             };
-
-            reader.onload = async function(e) {
-                progressFill.style.width = '50%';
-                submitBtn.textContent = '⏳ Сохранение в GitHub...';
-
-                const id = Date.now().toString();
-                const metadata = {
-                    id: id,
-                    title: document.getElementById('titleInput').value.trim(),
-                    author: document.getElementById('authorInput').value.trim() || 'Аноним',
-                    videoUrl: e.target.result,
-                    views: 0,
-                    likes: 0,
-                    date: new Date().toISOString()
-                };
-
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(metadata))));
-
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/videos/${id}.json`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${TOKEN}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: `🎬 Новое видео: ${metadata.title}`,
-                            content: content
-                        })
-                    });
-
-                    if (!res.ok) {
-                        const err = await res.json();
-                        throw new Error(err.message);
-                    }
-
-                    progressFill.style.width = '100%';
-                    toast('✅ Видео сохранено в папку videos/');
-
-                    setTimeout(() => {
-                        document.getElementById('uploadForm').reset();
-                        document.getElementById('videoLabel').textContent = '📁 Выбрать видео';
-                        progressBar.style.display = 'none';
-                        progressFill.style.width = '0%';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '✨ Загрузить видео';
-                        showPage('main');
-                    }, 1000);
-
-                } catch(err) {
-                    toast('❌ ' + err.message, 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '✨ Загрузить видео';
-                    progressBar.style.display = 'none';
-                }
-            };
-
             reader.readAsDataURL(file);
         });
 
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + page).classList.add('active');
-
+        function show(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.getElementById(p).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-
-            if (page === 'main') loadVideos();
+            document.querySelector(`[data-p="${p}"]`)?.classList.add('active');
+            if (p === 'main') loadVideos();
         }
 
-        function toast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
-            setTimeout(() => t.classList.remove('show'), 3000);
+        function toast(m, t='') {
+            const el = document.getElementById('toast');
+            el.textContent = m; el.className = 'toast show ' + t;
+            setTimeout(() => el.classList.remove('show'), 2000);
         }
 
-        document.getElementById('videoInput').addEventListener('change', function() {
-            const label = document.getElementById('videoLabel');
+        document.getElementById('file').addEventListener('change', function() {
             if (this.files[0]) {
-                label.textContent = '📁 ' + this.files[0].name;
-                if (!document.getElementById('titleInput').value) {
-                    document.getElementById('titleInput').value = this.files[0].name.replace(/\.[^/.]+$/, "");
+                document.getElementById('fileLabel').textContent = '📁 ' + this.files[0].name;
+                if (!document.getElementById('title').value) {
+                    document.getElementById('title').value = this.files[0].name.replace(/\.[^/.]+$/, "");
                 }
             }
         });
