@@ -24,7 +24,6 @@
         video{width:100%;border-radius:20px;margin-bottom:15px;background:#000}
         .details{background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);border-radius:20px;padding:20px}
         .details h2{color:#1a5276;margin-bottom:10px}
-        .btn-like{background:linear-gradient(180deg,#7DCEA0,#27AE60);margin-right:10px;margin-top:10px}
         .badge{background:rgba(255,255,255,0.3);padding:4px 10px;border-radius:15px;font-size:12px;margin-right:5px}
         .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#27AE60;color:white;padding:15px 25px;border-radius:25px;font-weight:bold;z-index:1000;display:none}
         .toast.show{display:block}
@@ -48,26 +47,21 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Logo_of_YouTube_%282006-2011%29.svg" class="logo" onclick="show('main')">
             <button class="btn btn-up" onclick="show('upload')">⬆️ Загрузить</button>
         </div>
-
         <div class="content page active" id="main">
-            <button class="btn" style="background:#5DADE2;margin-bottom:15px;" onclick="loadVideos()">🔄 Обновить</button>
             <div id="list"></div>
         </div>
-
         <div class="content page" id="video">
             <span class="back" onclick="show('main')">⬅️ Назад</span>
             <div id="player"></div>
         </div>
-
         <div class="content page" id="upload">
             <span class="back" onclick="show('main')">⬅️ Назад</span>
-            <input type="text" class="input" id="title" placeholder="📝 Название">
-            <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео</label>
+            <input type="text" class="input" id="title" placeholder="📝 Название видео">
+            <label class="file-label" for="file" id="fileLabel">📁 Выбрать видео (до 10MB)</label>
             <input type="file" class="file-inp" id="file" accept="video/*">
             <div class="progress" id="bar"><div class="progress-fill" id="fill"></div></div>
-            <button class="green-btn" onclick="upload()">✨ Загрузить</button>
+            <button class="green-btn" id="submitBtn" onclick="upload()">✨ Загрузить видео</button>
         </div>
-
         <div class="nav">
             <button class="nav-btn active" data-p="main" onclick="show('main')">🏠 Главная</button>
             <button class="nav-btn" data-p="upload" onclick="show('upload')">⬆️ Загрузить</button>
@@ -76,91 +70,118 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const SCRIPT = 'https://script.google.com/macros/s/AKfycbyneIOIM5F9MAfE1ddf7inB-w4P8WO_5kW7n--JRDQKjFqcO31f9SG_kia2tQSmT0OK/exec';
-
-        async function loadVideos() {
-            const list = document.getElementById('list');
-            list.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>';
-            
-            try {
-                const res = await fetch(SCRIPT);
-                const videos = await res.json();
-                
-                if (!videos.length) {
-                    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео</p></div>';
-                    return;
-                }
-                
-                list.innerHTML = videos.map(v => `
-                    <div class="card" onclick="openVideo('${v.id}')">
-                        <h3>🎬 ${v.name}</h3>
-                        <p><span class="badge">👁 ${v.views||0}</span> <span class="badge">❤️ ${v.likes||0}</span></p>
-                    </div>
-                `).join('');
-            } catch(e) {
-                list.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><p>Ошибка</p></div>';
-            }
+        // Всё хранится в localStorage браузера
+        function getVideos() {
+            try { return JSON.parse(localStorage.getItem('yt') || '[]'); }
+            catch(e) { return []; }
+        }
+        
+        function saveVideos(v) {
+            localStorage.setItem('yt', JSON.stringify(v));
         }
 
-        function openVideo(id) {
-            fetch(`${SCRIPT}?id=${id}`)
-                .then(r => r.json())
-                .then(v => {
-                    show('video');
-                    document.getElementById('player').innerHTML = `
-                        <video controls autoplay playsinline>
-                            <source src="${v.downloadUrl}" type="video/mp4">
-                        </video>
-                        <div class="details">
-                            <h2>${v.name}</h2>
-                            <p style="color:#5D6D7E;">👁 ${v.views} просмотров</p>
-                            <button class="btn btn-like" onclick="like('${v.id}')">❤️ ${v.likes}</button>
-                        </div>
-                    `;
-                });
+        function loadVideos() {
+            const list = document.getElementById('list');
+            const videos = getVideos();
+            
+            if (!videos.length) {
+                list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Нет видео</p><p style="font-size:13px;">Нажмите "Загрузить" чтобы добавить</p></div>';
+                return;
+            }
+            
+            list.innerHTML = videos.map(v => `
+                <div class="card" onclick="playVideo('${v.id}')">
+                    <h3>🎬 ${v.name}</h3>
+                    <p><span class="badge">👁 ${v.views||0}</span> <span class="badge">❤️ ${v.likes||0}</span></p>
+                </div>`).join('');
+        }
+
+        function playVideo(id) {
+            const videos = getVideos();
+            const v = videos.find(x => x.id === id);
+            if (!v) return;
+            
+            v.views = (v.views||0) + 1;
+            saveVideos(videos);
+            
+            show('video');
+            document.getElementById('player').innerHTML = `
+                <video controls autoplay playsinline>
+                    <source src="${v.data}" type="${v.type}">
+                </video>
+                <div class="details">
+                    <h2>${v.name}</h2>
+                    <p style="color:#5D6D7E;">👁 ${v.views} просмотров</p>
+                    <button class="btn" style="background:#27AE60;" onclick="like('${v.id}')">❤️ ${v.likes||0}</button>
+                    <button class="btn" style="background:#E74C3C;" onclick="del('${v.id}')">🗑 Удалить</button>
+                </div>`;
+            window.scrollTo(0,0);
         }
 
         function like(id) {
-            fetch(`${SCRIPT}?action=like&id=${id}`).then(() => openVideo(id));
+            const videos = getVideos();
+            const v = videos.find(x => x.id === id);
+            if (v) { v.likes = (v.likes||0) + 1; saveVideos(videos); playVideo(id); }
+        }
+
+        function del(id) {
+            if (confirm('Удалить видео?')) {
+                saveVideos(getVideos().filter(x => x.id !== id));
+                show('main');
+                toast('🗑 Удалено');
+            }
         }
 
         function upload() {
             const file = document.getElementById('file').files[0];
-            if (!file) return;
+            if (!file) { toast('⚠️ Выберите файл!'); return; }
+            
+            if (file.size > 10 * 1024 * 1024) {
+                toast('❌ Файл больше 10MB!');
+                return;
+            }
 
-            const btn = document.querySelector('.green-btn');
+            const btn = document.getElementById('submitBtn');
             const bar = document.getElementById('bar');
             const fill = document.getElementById('fill');
             
-            btn.disabled = true; btn.textContent = '⏳';
+            btn.disabled = true; btn.textContent = '⏳ Чтение...';
             bar.style.display = 'block'; fill.style.width = '0%';
 
             const reader = new FileReader();
-            reader.onprogress = e => {
-                if (e.lengthComputable) fill.style.width = (e.loaded/e.total*100) + '%';
+            
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    fill.style.width = (e.loaded / e.total * 100) + '%';
+                }
             };
             
-            reader.onload = async function(e) {
-                const base64 = e.target.result.split(',')[1];
-                await fetch(SCRIPT, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'upload',
-                        name: document.getElementById('title').value || file.name,
-                        file: base64,
-                        mimeType: file.type
-                    })
+            reader.onload = function(e) {
+                const videos = getVideos();
+                videos.unshift({
+                    id: Date.now().toString(),
+                    name: document.getElementById('title').value || file.name,
+                    data: e.target.result,
+                    type: file.type,
+                    views: 0,
+                    likes: 0,
+                    date: new Date().toISOString()
                 });
+                saveVideos(videos);
                 
                 fill.style.width = '100%';
-                toast('✅ Загружено!');
-                setTimeout(() => {
+                btn.textContent = '✅ Готово!';
+                
+                setTimeout(function() {
                     document.getElementById('file').value = '';
-                    document.getElementById('fileLabel').textContent = '📁 Выбрать видео';
+                    document.getElementById('fileLabel').textContent = '📁 Выбрать видео (до 10MB)';
                     document.getElementById('title').value = '';
                     bar.style.display = 'none';
-                    btn.disabled = false; btn.textContent = '✨ Загрузить';
+                    fill.style.width = '0%';
+                    btn.disabled = false;
+                    btn.textContent = '✨ Загрузить видео';
                     show('main');
+                    toast('✅ Видео загружено!');
                 }, 500);
             };
             
@@ -171,18 +192,20 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-p="${page}"]`)?.classList.add('active');
+            document.querySelector('[data-p="'+page+'"]')?.classList.add('active');
             if (page === 'main') loadVideos();
         }
 
         function toast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
+            setTimeout(function() { t.classList.remove('show'); }, 2000);
         }
 
         document.getElementById('file').addEventListener('change', function() {
-            if (this.files[0]) document.getElementById('fileLabel').textContent = '📁 ' + this.files[0].name;
+            if (this.files[0]) {
+                document.getElementById('fileLabel').textContent = '📁 ' + this.files[0].name;
+            }
         });
 
         loadVideos();
